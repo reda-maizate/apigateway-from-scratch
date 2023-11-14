@@ -1,0 +1,22 @@
+syntax = "proto3";
+package api.v1;
+option go_package = "gen/go";
+
+message UserRequest {
+  string mail = 1;
+  string password = 2;
+}
+
+message SignUpReply {
+  string message = 1;
+}
+
+message LoginUserReply {
+  string message = 1;
+  string auth_token = 2;
+}
+
+service User {
+  rpc SignUp (UserRequest) returns (SignUpReply) {}
+  rpc Login (UserRequest) returns (LoginUserReply) {}
+}

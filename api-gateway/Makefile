@@ -1,9 +1,8 @@
 buf:
-	protoc \
- 	--proto_path=. \
- 	--go_out=. \
- 	--go-grpc_out=. \
- 	-I /api/proto/compiled /api/proto/helloworld.proto
+	cd /api/v1/ && buf generate && cd /../../;
 
 run-server:
-	go run api/helloworld/server.go
+	go run api/v1/server.go
+
+run-client:
+	go run api/v1/client.go
