@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apigateway
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U apigateway" ]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+        #volumes:
+        #- db_data:/var/lib/postgresql/data
+
+        #notes_service:
+        #build:
+        #context: .
+        #dockerfile: Dockerfile-note
+        #ports:
+        #- 50051:50051
+      #depends_on:
+      #- db
+
+  users_service:
+    build:
+      context: .
+      target: service
+      dockerfile: Dockerfile-user
+    ports:
+      - 50052:50052
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apigateway
+    depends_on:
+      db:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      target: client
+      dockerfile: Dockerfile-user
+    depends_on:
+      db:
+        condition: service_healthy

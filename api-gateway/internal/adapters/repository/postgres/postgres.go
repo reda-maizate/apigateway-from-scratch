@@ -4,19 +4,22 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"log"
+	"os"
 )
 
-type APIGatewayRepository struct {
-	db  *pgx.Conn
-	ctx context.Context
-}
+var (
+	User     = os.Getenv("POSTGRES_USER")
+	Password = os.Getenv("POSTGRES_PASSWORD")
+	Dbname   = os.Getenv("POSTGRES_DB")
+)
 
-func NewAPIGatewayRepository(db *pgx.Conn) *APIGatewayRepository {
-	host := "localhost"
+func NewAPIGatewayRepository() *APIGatewayRepository {
+	host := "host.docker.internal"
 	port := "5432"
-	user := "postgres"
-	password := "postgres"
-	dbname := "postgres"
+	user := User
+	password := Password
+	dbname := Dbname
 
 	conn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		host,
@@ -26,10 +29,12 @@ func NewAPIGatewayRepository(db *pgx.Conn) *APIGatewayRepository {
 		password,
 	)
 
+	log.Println("Trying to connect to database : ", conn, " ...")
 	ctx := context.Background()
 	db, err := pgx.Connect(ctx, conn)
 
 	if err != nil {
+		log.Println("Failed to connect to database")
 		panic(err)
 	}
 

@@ -1,8 +1,8 @@
 buf:
-	cd /api/v1/ && buf generate && cd /../../;
+	cd ./api/v1/ && buf generate && cd ./../../;
 
 run-server:
-	go run api/v1/server.go
+	go run ./cmd/api/userServer.go
 
 run-client:
-	go run api/v1/client.go
+	go run ./cmd/api/client/client.go

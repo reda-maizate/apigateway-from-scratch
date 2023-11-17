@@ -12,3 +12,10 @@ CREATE TABLE IF NOT EXISTS Users
     password   VARCHAR(255) NOT NULL,
     auth_token VARCHAR(255) NOT NULL
 );
+
+INSERT INTO Users (email, password, auth_token)
+VALUES ('test@test.com', 'test_password', 'test_token');
+
+
+INSERT INTO Notes (title, content)
+VALUES ('test_title', 'test_content');

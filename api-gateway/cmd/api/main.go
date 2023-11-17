@@ -1,44 +1,79 @@
 package main
 
 import (
-	"api-gateway/api/v1/gen/go"
+	_go "api-gateway/api/v1/gen/go"
+	repository "api-gateway/internal/adapters/repository/postgres"
+	"api-gateway/internal/core/services"
 	"context"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"net"
-
-	"google.golang.org/grpc"
 )
 
-type server struct {
+/*
+type UserServer struct {
+	_go.UnimplementedUserServer
+}
+*/
+
+type UserServiceServer struct {
+	svc services.UserService
 	_go.UnimplementedUserServer
 }
 
-func NewServer() *server {
-	return &server{}
+func (uss *UserServiceServer) SignUp(ctx context.Context, req *_go.SignUpRequest) (*emptypb.Empty, error) {
+	err := uss.svc.SignUp(req.Email, req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }
 
-func (s *server) SignUp(ctx context.Context, in *_go.UserRequest) (*_go.SignUpReply, error) {
-	return &_go.SignUpReply{Message: in.GetMail()}, nil
+func (uss *UserServiceServer) Login(ctx context.Context, req *_go.LoginRequest) (*_go.LoginResponse, error) {
+	token, err := uss.svc.Login(req.Email, req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &_go.LoginResponse{Token: token}, nil
 }
 
-func (s *server) Login(ctx context.Context, in *_go.UserRequest) (*_go.LoginUserReply, error) {
-	return &_go.LoginUserReply{Message: "User logged in", AuthToken: "dsfjfkshsf7898987djoo"}, nil
+/*
+func NewUserServer() *UserServer {
+	return &UserServer{}
 }
+*/
 
 func main() {
-	// Create a listener on TCP port
-	lis, err := net.Listen("tcp", ":8080")
+	// Add a log to indicate that the server is starting
+	listener, err := net.Listen("tcp", ":50052")
+
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
+	/*
+		s := grpc.NewServer()
 
-	// Create a gRPC server object
-	s := grpc.NewServer()
-	// Attach the Greeter service to the server
-	//_go.RegisterGreeterServer(s, &server{})
-	_go.RegisterUserServer(s, &server{})
+		_go.RegisterUserServer(s, &UserServer{})
 
-	// Serve gRPC Server
-	log.Println("Serving gRPC on 0.0.0.0:8080")
-	log.Fatal(s.Serve(lis))
+		log.Println("Serving gRPC Server on 0.0.0.0:8080")
+		log.Fatal(s.Serve(lis))
+	*/
+
+	store := repository.NewAPIGatewayRepository()
+	svc := services.NewUserService(store)
+
+	server := UserServiceServer{svc: *svc}
+
+	grpcServer := grpc.NewServer()
+
+	_go.RegisterUserServer(grpcServer, &server)
+
+	log.Println("Serving gRPC Server on :50052")
+
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("failed to serve: %s", err)
+	}
 }

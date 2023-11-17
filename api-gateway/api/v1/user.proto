@@ -2,21 +2,25 @@ syntax = "proto3";
 package api.v1;
 option go_package = "gen/go";
 
-message UserRequest {
-  string mail = 1;
+import "google/protobuf/empty.proto";
+
+
+message LoginRequest {
+  string email = 1;
   string password = 2;
 }
 
-message SignUpReply {
-  string message = 1;
+message LoginResponse {
+  string token = 1;
 }
 
-message LoginUserReply {
-  string message = 1;
-  string auth_token = 2;
+message SignUpRequest {
+  string email = 1;
+  string password = 2;
 }
+
 
 service User {
-  rpc SignUp (UserRequest) returns (SignUpReply) {}
-  rpc Login (UserRequest) returns (LoginUserReply) {}
+  rpc SignUp (SignUpRequest) returns (google.protobuf.Empty);
+  rpc Login (LoginRequest) returns (LoginResponse);
 }
