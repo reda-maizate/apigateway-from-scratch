@@ -14,6 +14,11 @@ var (
 	Dbname   = os.Getenv("POSTGRES_DB")
 )
 
+type APIGatewayRepository struct {
+	db  *pgx.Conn
+	ctx context.Context
+}
+
 func NewAPIGatewayRepository() *APIGatewayRepository {
 	host := "host.docker.internal"
 	port := "5432"

@@ -16,23 +16,27 @@ services:
       interval: 3s
       timeout: 5s
       retries: 5
-        #volumes:
-        #- db_data:/var/lib/postgresql/data
 
-        #notes_service:
-        #build:
-        #context: .
-        #dockerfile: Dockerfile-note
-        #ports:
-        #- 50051:50051
-      #depends_on:
-      #- db
+  notes_service:
+    build:
+      context: .
+      target: notes
+      dockerfile: Dockerfile-services
+    ports:
+      - 50053:50053
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apigateway
+    depends_on:
+      db:
+        condition: service_healthy
 
   users_service:
     build:
       context: .
-      target: service
-      dockerfile: Dockerfile-user
+      target: users
+      dockerfile: Dockerfile-services
     ports:
       - 50052:50052
     environment:
@@ -47,7 +51,7 @@ services:
     build:
       context: .
       target: client
-      dockerfile: Dockerfile-user
+      dockerfile: Dockerfile-services
     depends_on:
       db:
         condition: service_healthy

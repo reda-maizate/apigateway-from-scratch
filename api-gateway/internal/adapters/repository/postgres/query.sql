@@ -1,5 +1,5 @@
 -- name: CreateNote :one
-INSERT INTO Notes (id, title, content)
+INSERT INTO Notes (uuid, title, content)
 VALUES ($1, $2, $3)
 RETURNING *;
 
@@ -8,8 +8,8 @@ SELECT *
 FROM Notes;
 
 -- name: CreateUser :one
-INSERT INTO Users (email, password, auth_token)
-VALUES ($1, $2, $3)
+INSERT INTO Users (uuid, email, password, auth_token)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetUser :one

@@ -41,4 +41,35 @@ func main() {
 		log.Fatalf("could not login: %v", err)
 	}
 	log.Printf("New User Logged in: %s / auth token: %s", email, r_login.GetToken())
+
+	// Notes
+	conn, err = grpc.Dial("host.docker.internal:50053", grpc.WithInsecure(), grpc.WithBlock())
+
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	cn := _go.NewNoteClient(conn)
+
+	if err != nil {
+		log.Fatalf("could not login: %v", err)
+	}
+
+	_, err = cn.CreateNote(ctx, &_go.CreateNoteRequest{
+		Note: &_go.NoteMessage{Title: "Test", Content: "Test"}},
+	)
+
+	if err != nil {
+		log.Fatalf("could not create note: %v", err)
+	}
+
+	log.Printf("New Note Created")
+
+	r_notes, err := cn.GetAllNotes(ctx, &_go.GetAllNotesRequest{})
+	if err != nil {
+		log.Fatalf("could not get all notes: %v", err)
+	}
+
+	log.Printf("All Notes: %v", r_notes.GetNotes())
 }

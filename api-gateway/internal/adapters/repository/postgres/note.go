@@ -1,15 +1,19 @@
 package postgres
 
 import (
-	"api-gateway/internal/adapters/repository/postgres/gen"
+	gen "api-gateway/internal/adapters/repository/postgres/gen"
 	"api-gateway/internal/core/domain"
+	"github.com/google/uuid"
 	"log"
 )
 
 func (p *APIGatewayRepository) Create(title, content string) error {
 	queries := gen.New(p.db)
 
+	note_uuid := uuid.New().String()
+
 	params := gen.CreateNoteParams{
+		Uuid:    note_uuid,
 		Title:   title,
 		Content: content,
 	}
