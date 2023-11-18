@@ -3,6 +3,7 @@ package api.v1;
 option go_package = "gen/go";
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 
 message LoginRequest {
@@ -21,6 +22,16 @@ message SignUpRequest {
 
 
 service User {
-  rpc SignUp (SignUpRequest) returns (google.protobuf.Empty);
-  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc SignUp (SignUpRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/users/signup"
+      body: "*"
+    };
+  }
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/login"
+      body: "*"
+    };
+  }
 }

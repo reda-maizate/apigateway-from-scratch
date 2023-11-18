@@ -14,12 +14,19 @@ COPY . .
 RUN go mod download
 
 
+FROM builder AS gateway
+# Command to run the application when starting the container
+COPY --from=builder /app/ /app/
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main ./cmd/api/gateway/
+EXPOSE 8080
+
+CMD ["/app/main"]
+
+
 FROM builder AS users
 # Command to run the application when starting the container
 COPY --from=builder /app/ /app/
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main ./cmd/api/users/
-#ENTRYPOINT ["tail"]
-#CMD ["-f","/dev/null"]
 EXPOSE 50052
 
 CMD ["/app/main"]

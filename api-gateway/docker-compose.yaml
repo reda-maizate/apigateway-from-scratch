@@ -17,6 +17,21 @@ services:
       timeout: 5s
       retries: 5
 
+  api_gateway:
+    build:
+      context: .
+      target: gateway
+      dockerfile: Dockerfile-services
+    ports:
+      - 8080:8080
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apigateway
+    depends_on:
+      db:
+        condition: service_healthy
+
   notes_service:
     build:
       context: .
