@@ -7,17 +7,18 @@ import "google/api/annotations.proto";
 
 
 message NoteMessage {
-  string title = 2;
-  string content = 3;
+  string title = 1;
+  string content = 2;
 }
 
 message CreateNoteRequest {
-//  string token = 1;
-  NoteMessage note = 1;
+//  NoteMessage note = 1;
+  string title = 1;
+  string content = 2;
 }
 
 message GetAllNotesRequest {
-  string token = 1;
+//  string token = 1;
 }
 
 message GetNoteResponse {
@@ -36,7 +37,7 @@ service Note {
       body: "*"
     };
   }
-  rpc GetAllNotes (GetAllNotesRequest) returns (GetAllNotesResponse) {
+  rpc GetAllNotes (google.protobuf.Empty) returns (GetAllNotesResponse) {
     option (google.api.http) = {
       get: "/v1/notes"
     };

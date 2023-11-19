@@ -4,8 +4,5 @@ buf:
 sqlc:
 	cd ./internal/adapters/repository/postgres/ && sqlc generate && cd ./../../../../;
 
-run-server:
-	go run ./cmd/api/userServer.go
-
-run-client:
-	go run ./cmd/api/client/client.go
+run:
+	 docker-compose build --no-cache && docker-compose up

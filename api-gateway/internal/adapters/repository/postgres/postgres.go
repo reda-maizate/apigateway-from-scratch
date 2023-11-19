@@ -34,7 +34,6 @@ func NewAPIGatewayRepository() *APIGatewayRepository {
 		password,
 	)
 
-	log.Println("Trying to connect to database : ", conn, " ...")
 	ctx := context.Background()
 	db, err := pgx.Connect(ctx, conn)
 

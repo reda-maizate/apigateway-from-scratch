@@ -17,7 +17,8 @@ type NoteServiceServer struct {
 }
 
 func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *_go.CreateNoteRequest) (*emptypb.Empty, error) {
-	err := nss.svc.Create(req.Note.Title, req.Note.Content)
+	log.Println("Print 1 :", req.GetTitle(), req.GetContent())
+	err := nss.svc.Create(req.GetTitle(), req.GetContent())
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +26,7 @@ func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *_go.CreateNot
 	return &emptypb.Empty{}, nil
 }
 
-func (nss *NoteServiceServer) GetAllNotes(ctx context.Context, req *_go.GetAllNotesRequest) (*_go.GetAllNotesResponse, error) {
+func (nss *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*_go.GetAllNotesResponse, error) {
 	notes, err := nss.svc.GetAll()
 	if err != nil {
 		return nil, err

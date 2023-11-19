@@ -29,7 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NoteClient interface {
 	CreateNote(ctx context.Context, in *CreateNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetAllNotes(ctx context.Context, in *GetAllNotesRequest, opts ...grpc.CallOption) (*GetAllNotesResponse, error)
+	GetAllNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllNotesResponse, error)
 }
 
 type noteClient struct {
@@ -49,7 +49,7 @@ func (c *noteClient) CreateNote(ctx context.Context, in *CreateNoteRequest, opts
 	return out, nil
 }
 
-func (c *noteClient) GetAllNotes(ctx context.Context, in *GetAllNotesRequest, opts ...grpc.CallOption) (*GetAllNotesResponse, error) {
+func (c *noteClient) GetAllNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllNotesResponse, error) {
 	out := new(GetAllNotesResponse)
 	err := c.cc.Invoke(ctx, Note_GetAllNotes_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -63,7 +63,7 @@ func (c *noteClient) GetAllNotes(ctx context.Context, in *GetAllNotesRequest, op
 // for forward compatibility
 type NoteServer interface {
 	CreateNote(context.Context, *CreateNoteRequest) (*emptypb.Empty, error)
-	GetAllNotes(context.Context, *GetAllNotesRequest) (*GetAllNotesResponse, error)
+	GetAllNotes(context.Context, *emptypb.Empty) (*GetAllNotesResponse, error)
 	mustEmbedUnimplementedNoteServer()
 }
 
@@ -74,7 +74,7 @@ type UnimplementedNoteServer struct {
 func (UnimplementedNoteServer) CreateNote(context.Context, *CreateNoteRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNote not implemented")
 }
-func (UnimplementedNoteServer) GetAllNotes(context.Context, *GetAllNotesRequest) (*GetAllNotesResponse, error) {
+func (UnimplementedNoteServer) GetAllNotes(context.Context, *emptypb.Empty) (*GetAllNotesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllNotes not implemented")
 }
 func (UnimplementedNoteServer) mustEmbedUnimplementedNoteServer() {}
@@ -109,7 +109,7 @@ func _Note_CreateNote_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Note_GetAllNotes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllNotesRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func _Note_GetAllNotes_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: Note_GetAllNotes_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NoteServer).GetAllNotes(ctx, req.(*GetAllNotesRequest))
+		return srv.(NoteServer).GetAllNotes(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
