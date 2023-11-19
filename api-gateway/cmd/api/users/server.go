@@ -6,7 +6,6 @@ import (
 	"api-gateway/internal/core/services"
 	"context"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"net"
 )
@@ -16,22 +15,22 @@ type UserServiceServer struct {
 	_go.UnimplementedUserServer
 }
 
-func (uss *UserServiceServer) SignUp(ctx context.Context, req *_go.SignUpRequest) (*emptypb.Empty, error) {
-	err := uss.svc.SignUp(req.Email, req.Password)
+func (uss *UserServiceServer) SignUp(ctx context.Context, req *_go.SignUpRequest) (*_go.UserResponse, error) {
+	token, err := uss.svc.SignUp(req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &emptypb.Empty{}, nil
+	return &_go.UserResponse{Token: token}, nil
 }
 
-func (uss *UserServiceServer) Login(ctx context.Context, req *_go.LoginRequest) (*_go.LoginResponse, error) {
+func (uss *UserServiceServer) Login(ctx context.Context, req *_go.LoginRequest) (*_go.UserResponse, error) {
 	token, err := uss.svc.Login(req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &_go.LoginResponse{Token: token}, nil
+	return &_go.UserResponse{Token: token}, nil
 }
 
 func main() {

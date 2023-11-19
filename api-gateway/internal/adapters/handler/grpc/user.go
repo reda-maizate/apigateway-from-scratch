@@ -18,6 +18,6 @@ func (guh *GrpcUserHandler) Login(email, password string) (string, error) {
 	return guh.svc.Login(email, password)
 }
 
-func (guh *GrpcUserHandler) SignUp(email, password string) error {
+func (guh *GrpcUserHandler) SignUp(email, password string) (string, error) {
 	return guh.svc.SignUp(email, password)
 }

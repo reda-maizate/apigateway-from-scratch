@@ -11,7 +11,7 @@ message LoginRequest {
   string password = 2;
 }
 
-message LoginResponse {
+message UserResponse {
   string token = 1;
 }
 
@@ -22,13 +22,13 @@ message SignUpRequest {
 
 
 service User {
-  rpc SignUp (SignUpRequest) returns (google.protobuf.Empty) {
+  rpc SignUp (SignUpRequest) returns (UserResponse) {
     option (google.api.http) = {
       post: "/v1/users/signup"
       body: "*"
     };
   }
-  rpc Login (LoginRequest) returns (LoginResponse) {
+  rpc Login (LoginRequest) returns (UserResponse) {
     option (google.api.http) = {
       post: "/v1/users/login"
       body: "*"

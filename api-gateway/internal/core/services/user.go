@@ -18,6 +18,6 @@ func (s *UserService) Login(email string, password string) (string, error) {
 	return s.repo.Login(email, password)
 }
 
-func (s *UserService) SignUp(email string, password string) error {
+func (s *UserService) SignUp(email string, password string) (string, error) {
 	return s.repo.SignUp(email, password)
 }
