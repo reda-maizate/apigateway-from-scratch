@@ -62,11 +62,17 @@ services:
       db:
         condition: service_healthy
 
-#  client:
-#    build:
-#      context: .
-#      target: client
-#      dockerfile: Dockerfile-services
-#    depends_on:
-#      db:
-#        condition: service_healthy
+  permissions_service:
+    build:
+      context: .
+      target: permissions
+      dockerfile: Dockerfile-services
+    ports:
+      - 50054:50054
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apigateway
+    depends_on:
+      db:
+        condition: service_healthy

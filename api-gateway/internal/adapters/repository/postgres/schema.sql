@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS Users
 CREATE TABLE IF NOT EXISTS Permissions
 (
     uuid     TEXT PRIMARY KEY,
-    role     VARCHAR(255) NOT NULL,
     service  VARCHAR(255) NOT NULL,
     resource VARCHAR(255) NOT NULL,
     action   VARCHAR(255) NOT NULL
@@ -39,8 +38,8 @@ INSERT INTO Notes (uuid, title, content)
 VALUES ('a573a8ab-a6d2-4107-a504-8d9f6f76c016', 'test_title', 'test_content');
 
 
-INSERT INTO Permissions (uuid, role, service, resource, action)
-VALUES ('a573a8ab-a6d2-4107-a504-8d9f6f76c016', 'admin', 'notes', 'a573a8ab-a6d2-4107-a504-8d9f6f76c016', 'read');
+INSERT INTO Permissions (uuid, service, resource, action)
+VALUES ('a573a8ab-a6d2-4107-a504-8d9f6f76c016', 'notes', 'note', 'read');
 
 
 INSERT INTO UserPermissions (user_uuid, permission_uuid)

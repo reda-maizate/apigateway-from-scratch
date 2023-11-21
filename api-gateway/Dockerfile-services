@@ -41,8 +41,8 @@ EXPOSE 50053
 CMD ["/app/main"]
 
 
-FROM builder AS client
+FROM builder AS permissions
 # Command to run the application when starting the container
 COPY --from=builder /app/ /app/
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main ./cmd/api/client/
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main ./cmd/api/permissions/
 CMD ["/app/main"]

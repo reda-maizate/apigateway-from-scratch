@@ -12,9 +12,21 @@ type Note struct {
 	Content string
 }
 
+type Permission struct {
+	Uuid     string
+	Service  string
+	Resource string
+	Action   string
+}
+
 type User struct {
 	Uuid      string
 	Email     string
 	Password  string
 	AuthToken string
+}
+
+type Userpermission struct {
+	UserUuid       string
+	PermissionUuid string
 }
