@@ -16,3 +16,8 @@ RETURNING *;
 SELECT *
 FROM Users
 WHERE email = $1;
+
+-- name: GetUserByAuthToken :one
+SELECT *
+FROM Users
+WHERE auth_token = $1;

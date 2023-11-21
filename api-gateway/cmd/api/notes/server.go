@@ -6,6 +6,9 @@ import (
 	"api-gateway/internal/core/services"
 	"context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"net"
@@ -17,7 +20,7 @@ type NoteServiceServer struct {
 }
 
 func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *_go.CreateNoteRequest) (*emptypb.Empty, error) {
-	log.Println("Print 1 :", req.GetTitle(), req.GetContent())
+	//log.Println("Print 1 :", req.GetTitle(), req.GetContent())
 	err := nss.svc.Create(req.GetTitle(), req.GetContent())
 	if err != nil {
 		return nil, err
@@ -44,6 +47,24 @@ func (nss *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empt
 	return &_go.GetAllNotesResponse{Notes: notesResponse}, nil
 }
 
+func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, gatewayRepository *repository.APIGatewayRepository) (interface{}, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "Missing context metadata")
+	}
+
+	token := md["authorization"]
+	if len(token) == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "Missing authorization token")
+	}
+
+	if !gatewayRepository.AuthTokenExists(token[0]) {
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid token")
+	}
+
+	return handler(ctx, req)
+}
+
 func main() {
 	listener, err := net.Listen("tcp", ":50053")
 
@@ -56,7 +77,11 @@ func main() {
 
 	server := NoteServiceServer{svc: *svc}
 
-	grpcServer := grpc.NewServer()
+	var opts []grpc.ServerOption
+	opts = append(opts, grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		return AuthInterceptor(ctx, req, info, handler, store)
+	}))
+	grpcServer := grpc.NewServer(opts...)
 
 	_go.RegisterNoteServer(grpcServer, &server)
 

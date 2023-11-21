@@ -100,3 +100,21 @@ func (q *Queries) GetUser(ctx context.Context, email string) (User, error) {
 	)
 	return i, err
 }
+
+const getUserByAuthToken = `-- name: GetUserByAuthToken :one
+SELECT uuid, email, password, auth_token
+FROM Users
+WHERE auth_token = $1
+`
+
+func (q *Queries) GetUserByAuthToken(ctx context.Context, authToken string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByAuthToken, authToken)
+	var i User
+	err := row.Scan(
+		&i.Uuid,
+		&i.Email,
+		&i.Password,
+		&i.AuthToken,
+	)
+	return i, err
+}
