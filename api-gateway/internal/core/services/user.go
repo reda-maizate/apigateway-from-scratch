@@ -1,7 +1,6 @@
 package services
 
 import (
-	"api-gateway/internal/core/domain"
 	"api-gateway/internal/core/ports"
 )
 
@@ -15,14 +14,14 @@ func NewUserService(repo ports.UserService) *UserService {
 	}
 }
 
-func (s *UserService) Login(email string, password string) (string, error) {
-	return s.userRepository.Login(email, password)
+func (s *UserService) Login(loginParams ports.UserParams) (ports.UserResponse, error) {
+	return s.userRepository.Login(loginParams)
 }
 
-func (s *UserService) SignUp(email string, password string) (string, error) {
-	return s.userRepository.SignUp(email, password)
+func (s *UserService) SignUp(signupParams ports.UserParams) (ports.UserResponse, error) {
+	return s.userRepository.SignUp(signupParams)
 }
 
-func (s *UserService) UserFromToken(token string) (*domain.User, error) {
-	return s.userRepository.UserFromToken(token)
+func (s *UserService) UserFromToken(userFromTokenParams ports.UserFromTokenParams) (ports.UserFromTokenResponse, error) {
+	return s.userRepository.UserFromToken(userFromTokenParams)
 }

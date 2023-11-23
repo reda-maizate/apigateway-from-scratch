@@ -2,14 +2,31 @@ package ports
 
 import "api-gateway/internal/core/domain"
 
+type UserParams struct {
+	Email    string
+	Password string
+}
+
+type UserResponse struct {
+	Token string
+}
+
+type UserFromTokenParams struct {
+	Token string
+}
+
+type UserFromTokenResponse struct {
+	User *domain.User
+}
+
 type UserService interface {
-	Login(email, password string) (string, error)
-	SignUp(email, password string) (string, error)
-	UserFromToken(token string) (*domain.User, error)
+	Login(UserParams) (UserResponse, error)
+	SignUp(UserParams) (UserResponse, error)
+	UserFromToken(UserFromTokenParams) (UserFromTokenResponse, error)
 }
 
 type UserRepository interface {
-	Login(email, password string) (string, error)
-	SignUp(email, password string) (string, error)
-	UserFromToken(token string) (*domain.User, error)
+	Login(UserParams) (UserResponse, error)
+	SignUp(UserParams) (UserResponse, error)
+	UserFromToken(UserFromTokenParams) (UserFromTokenResponse, error)
 }

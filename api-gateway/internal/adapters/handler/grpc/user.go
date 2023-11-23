@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"api-gateway/internal/core/domain"
+	"api-gateway/internal/core/ports"
 	"api-gateway/internal/core/services"
 )
 
@@ -15,14 +15,14 @@ func NewGrpcUserHandler(userService services.UserService) *GrpcUserHandler {
 	}
 }
 
-func (h *GrpcUserHandler) Login(email, password string) (string, error) {
-	return h.userService.Login(email, password)
+func (h *GrpcUserHandler) Login(loginParams ports.UserParams) (ports.UserResponse, error) {
+	return h.userService.Login(loginParams)
 }
 
-func (h *GrpcUserHandler) SignUp(email, password string) (string, error) {
-	return h.userService.SignUp(email, password)
+func (h *GrpcUserHandler) SignUp(signupParams ports.UserParams) (ports.UserResponse, error) {
+	return h.userService.SignUp(signupParams)
 }
 
-func (h *GrpcUserHandler) UserFromToken(token string) (*domain.User, error) {
-	return h.userService.UserFromToken(token)
+func (h *GrpcUserHandler) UserFromToken(userFromTokenParams ports.UserFromTokenParams) (ports.UserFromTokenResponse, error) {
+	return h.userService.UserFromToken(userFromTokenParams)
 }

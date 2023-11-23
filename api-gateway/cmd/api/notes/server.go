@@ -3,6 +3,7 @@ package main
 import (
 	pb "api-gateway/api/v1/gen/go"
 	repository "api-gateway/internal/adapters/repository/postgres"
+	"api-gateway/internal/core/ports"
 	"api-gateway/internal/core/services"
 	"context"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -21,11 +22,15 @@ const (
 )
 
 type NoteServiceServer struct {
-	notesSvc services.NoteService
+	notesService services.NoteService
 	pb.UnimplementedNoteServer
 }
 
-func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *pb.CreateNoteRequest) (*emptypb.Empty, error) {
+func NewNoteServiceServer(notesService *services.NoteService) pb.NoteServer {
+	return &NoteServiceServer{notesService: *notesService}
+}
+
+func (s *NoteServiceServer) CreateNote(ctx context.Context, req *pb.CreateNoteRequest) (*emptypb.Empty, error) {
 	hasPermission, err := CheckPermission(ctx, "create")
 	if err != nil || !hasPermission {
 		return nil, err
@@ -33,7 +38,12 @@ func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *pb.CreateNote
 
 	userUuid := ctx.Value("userUuid").(*pb.MeUserResponse).GetId()
 
-	err = nss.notesSvc.Create(req.GetTitle(), req.GetContent(), userUuid)
+	createNoteParams := ports.CreateNoteParams{
+		Title:    req.GetTitle(),
+		Content:  req.GetContent(),
+		UserUuid: userUuid,
+	}
+	err = s.notesService.Create(createNoteParams)
 	if err != nil {
 		return nil, err
 	}
@@ -41,15 +51,15 @@ func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *pb.CreateNote
 	return &emptypb.Empty{}, nil
 }
 
-func (nss *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*pb.GetAllNotesResponse, error) {
-	notes, err := nss.notesSvc.GetAll()
+func (s *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*pb.GetAllNotesResponse, error) {
+	notes, err := s.notesService.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
 	var notesResponse []*pb.NoteMessage
 
-	for _, note := range notes {
+	for _, note := range notes.Notes {
 		notesResponse = append(notesResponse, &pb.NoteMessage{
 			Title:   note.Title,
 			Content: note.Content,
@@ -107,10 +117,12 @@ func CheckPermission(ctx context.Context, Action string) (bool, error) {
 		UserUuid: userUuid.GetId(),
 		Service:  Service,
 		Resource: Resource,
+		Action:   Action,
 	})
 
 	//log.Println("PermissionsInterceptor hasPermission:", hasPermission)
 	if err != nil || !hasPermission.GetHasPermission() {
+		log.Println("PermissionsInterceptor hasPermission:", hasPermission, "/ err:", err)
 		return false, status.Errorf(codes.PermissionDenied, "You don't have permission to create note")
 	}
 
@@ -125,9 +137,9 @@ func main() {
 	}
 
 	store := repository.NewAPIGatewayRepository()
-	notesSvc := services.NewNoteService(store)
+	notesService := services.NewNoteService(store)
 
-	server := NoteServiceServer{notesSvc: *notesSvc}
+	server := NewNoteServiceServer(notesService)
 
 	var opts []grpc.ServerOption
 	opts = append(opts, grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
@@ -137,7 +149,7 @@ func main() {
 	)))
 	grpcServer := grpc.NewServer(opts...)
 
-	pb.RegisterNoteServer(grpcServer, &server)
+	pb.RegisterNoteServer(grpcServer, server)
 
 	log.Println("Serving Notes-service in gRPC Server on :50053")
 

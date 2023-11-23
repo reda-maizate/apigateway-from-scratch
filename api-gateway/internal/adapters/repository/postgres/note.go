@@ -3,21 +3,22 @@ package postgres
 import (
 	gen "api-gateway/internal/adapters/repository/postgres/gen"
 	"api-gateway/internal/core/domain"
+	"api-gateway/internal/core/ports"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (r *APIGatewayRepository) Create(title, content, userUuid string) error {
+func (r *APIGatewayRepository) Create(createNoteParams ports.CreateNoteParams) error {
 	queries := gen.New(r.db)
 
 	note_uuid := uuid.New().String()
 
-	user_uuid_text := pgtype.Text{String: userUuid, Valid: true}
+	user_uuid_text := pgtype.Text{String: createNoteParams.UserUuid, Valid: true}
 
 	params := gen.CreateNoteParams{
 		Uuid:      note_uuid,
-		Title:     title,
-		Content:   content,
+		Title:     createNoteParams.Title,
+		Content:   createNoteParams.Content,
 		CreatedBy: user_uuid_text,
 	}
 
@@ -31,13 +32,13 @@ func (r *APIGatewayRepository) Create(title, content, userUuid string) error {
 	return nil
 }
 
-func (r *APIGatewayRepository) GetAll() ([]*domain.Note, error) {
+func (r *APIGatewayRepository) GetAll() (ports.GetAllResponse, error) {
 	queries := gen.New(r.db)
 
 	res, err := queries.GetAllNotes(r.ctx)
 
 	if err != nil {
-		return nil, err
+		return ports.GetAllResponse{}, err
 	}
 
 	var notes []*domain.Note
@@ -49,5 +50,7 @@ func (r *APIGatewayRepository) GetAll() ([]*domain.Note, error) {
 		})
 	}
 
-	return notes, nil
+	return ports.GetAllResponse{
+		Notes: notes,
+	}, nil
 }

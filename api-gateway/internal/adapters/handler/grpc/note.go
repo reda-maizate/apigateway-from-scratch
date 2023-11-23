@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"api-gateway/internal/core/domain"
+	"api-gateway/internal/core/ports"
 	"api-gateway/internal/core/services"
 )
 
@@ -15,10 +15,10 @@ func NewGrpcNoteHandler(noteService services.NoteService) *GrpcNoteHandler {
 	}
 }
 
-func (h *GrpcNoteHandler) Create(title, content, userUuid string) error {
-	return h.noteService.Create(title, content, userUuid)
+func (h *GrpcNoteHandler) Create(createNoteParams ports.CreateNoteParams) error {
+	return h.noteService.Create(createNoteParams)
 }
 
-func (h *GrpcNoteHandler) GetAll() ([]*domain.Note, error) {
+func (h *GrpcNoteHandler) GetAll() (ports.GetAllResponse, error) {
 	return h.noteService.GetAll()
 }

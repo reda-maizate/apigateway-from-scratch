@@ -1,9 +1,20 @@
 package ports
 
+type CheckPermissionParams struct {
+	UserUuid string
+	Service  string
+	Resource string
+	Action   string
+}
+
+type CheckPermissionResponse struct {
+	Authorized bool
+}
+
 type PermissionService interface {
-	CheckPermission(UserUuid, Service, Resource, Action string) (bool, error)
+	CheckPermission(CheckPermissionParams) (CheckPermissionResponse, error)
 }
 
 type PermissionRepository interface {
-	CheckPermission(UserUuid, Service, Resource, Action string) (bool, error)
+	CheckPermission(CheckPermissionParams) (CheckPermissionResponse, error)
 }

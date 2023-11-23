@@ -12,6 +12,6 @@ func NewPermissionService(repo ports.PermissionRepository) *PermissionService {
 	}
 }
 
-func (s *PermissionService) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
-	return s.permissionRepository.CheckPermission(UserUuid, Service, Resource, Action)
+func (s *PermissionService) CheckPermission(checkPermissionParams ports.CheckPermissionParams) (ports.CheckPermissionResponse, error) {
+	return s.permissionRepository.CheckPermission(checkPermissionParams)
 }

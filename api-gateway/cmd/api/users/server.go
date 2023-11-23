@@ -3,6 +3,7 @@ package main
 import (
 	pb "api-gateway/api/v1/gen/go"
 	repository "api-gateway/internal/adapters/repository/postgres"
+	"api-gateway/internal/core/ports"
 	"api-gateway/internal/core/services"
 	"context"
 	"google.golang.org/grpc"
@@ -11,40 +12,52 @@ import (
 )
 
 type UserServiceServer struct {
-	userSvc services.UserService
+	userService services.UserService
 	pb.UnimplementedUserServer
 }
 
-func NewUserServiceServer(userSvc *services.UserService) pb.UserServer {
-	return &UserServiceServer{userSvc: *userSvc}
+func NewUserServiceServer(userService *services.UserService) pb.UserServer {
+	return &UserServiceServer{userService: *userService}
 }
 
-func (uss *UserServiceServer) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.UserResponse, error) {
-	token, err := uss.userSvc.SignUp(req.Email, req.Password)
+func (s *UserServiceServer) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.UserResponse, error) {
+	signUpParams := ports.UserParams{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	userResponse, err := s.userService.SignUp(signUpParams)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.UserResponse{Token: token}, nil
+	return &pb.UserResponse{Token: userResponse.Token}, nil
 }
 
-func (uss *UserServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.UserResponse, error) {
-	token, err := uss.userSvc.Login(req.Email, req.Password)
+func (s *UserServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.UserResponse, error) {
+	logInParams := ports.UserParams{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	userResponse, err := s.userService.Login(logInParams)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.UserResponse{Token: token}, nil
+	return &pb.UserResponse{Token: userResponse.Token}, nil
 }
 
-func (uss *UserServiceServer) UserFromToken(ctx context.Context, req *pb.MeUserRequest) (*pb.MeUserResponse, error) {
-	//log.Println("UserFromToken", req.Token)
-	user, err := uss.userSvc.UserFromToken(req.Token)
+func (s *UserServiceServer) UserFromToken(ctx context.Context, req *pb.MeUserRequest) (*pb.MeUserResponse, error) {
+	userFromTokenParams := ports.UserFromTokenParams{
+		Token: req.Token,
+	}
+	userFromTokenResponse, err := s.userService.UserFromToken(userFromTokenParams)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.MeUserResponse{Id: user.Uuid}, nil
+	return &pb.MeUserResponse{Id: userFromTokenResponse.User.Uuid}, nil
 }
 
 func main() {
@@ -55,9 +68,9 @@ func main() {
 	}
 
 	store := repository.NewAPIGatewayRepository()
-	userSvc := services.NewUserService(store)
+	userService := services.NewUserService(store)
 
-	server := NewUserServiceServer(userSvc)
+	server := NewUserServiceServer(userService)
 
 	grpcServer := grpc.NewServer()
 

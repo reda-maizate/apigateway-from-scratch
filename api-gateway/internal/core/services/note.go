@@ -1,7 +1,6 @@
 package services
 
 import (
-	"api-gateway/internal/core/domain"
 	"api-gateway/internal/core/ports"
 )
 
@@ -15,10 +14,10 @@ func NewNoteService(repo ports.NoteRepository) *NoteService {
 	}
 }
 
-func (s *NoteService) Create(title, content, userUuid string) error {
-	return s.noteRepository.Create(title, content, userUuid)
+func (s *NoteService) Create(createNoteParams ports.CreateNoteParams) error {
+	return s.noteRepository.Create(createNoteParams)
 }
 
-func (s *NoteService) GetAll() ([]*domain.Note, error) {
+func (s *NoteService) GetAll() (ports.GetAllResponse, error) {
 	return s.noteRepository.GetAll()
 }

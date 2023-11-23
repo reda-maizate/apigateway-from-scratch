@@ -1,6 +1,9 @@
 package grpc
 
-import "api-gateway/internal/core/services"
+import (
+	"api-gateway/internal/core/ports"
+	"api-gateway/internal/core/services"
+)
 
 type GrpcPermissionHandler struct {
 	permissionService services.PermissionService
@@ -12,6 +15,6 @@ func NewGrpcPermissionHandler(permissionService services.PermissionService) *Grp
 	}
 }
 
-func (h *GrpcPermissionHandler) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
-	return h.permissionService.CheckPermission(UserUuid, Service, Resource, Action)
+func (h *GrpcPermissionHandler) CheckPermission(checkPermissionParams ports.CheckPermissionParams) (ports.CheckPermissionResponse, error) {
+	return h.permissionService.CheckPermission(checkPermissionParams)
 }
