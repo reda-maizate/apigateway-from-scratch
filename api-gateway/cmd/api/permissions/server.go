@@ -1,7 +1,7 @@
 package main
 
 import (
-	_go "api-gateway/api/v1/gen/go"
+	pb "api-gateway/api/v1/gen/go"
 	repository "api-gateway/internal/adapters/repository/postgres"
 	"api-gateway/internal/core/services"
 	"context"
@@ -12,16 +12,16 @@ import (
 
 type PermissionServiceServer struct {
 	svc services.PermissionService
-	_go.UnimplementedPermissionServer
+	pb.UnimplementedPermissionServer
 }
 
-func (pss *PermissionServiceServer) CheckPermission(ctx context.Context, req *_go.CheckPermissionRequest) (*_go.CheckPermissionResponse, error) {
+func (pss *PermissionServiceServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
 	HasPermission, err := pss.svc.CheckPermission(req.UserUuid, req.Service, req.Resource, req.Action)
 	if err != nil {
 		return nil, err
 	}
 
-	return &_go.CheckPermissionResponse{HasPermission: HasPermission}, nil
+	return &pb.CheckPermissionResponse{HasPermission: HasPermission}, nil
 }
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	_go.RegisterPermissionServer(grpcServer, &server)
+	pb.RegisterPermissionServer(grpcServer, &server)
 
 	log.Println("Serving Permissions-service in gRPC Server on :50054")
 

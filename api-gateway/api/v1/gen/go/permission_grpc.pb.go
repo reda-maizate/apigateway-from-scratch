@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: permission.proto
 
-package _go
+package pb
 
 import (
 	context "context"

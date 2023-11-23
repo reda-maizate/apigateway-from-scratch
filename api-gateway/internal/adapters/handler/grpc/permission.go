@@ -12,6 +12,6 @@ func NewGrpcPermissionHandler(svc services.PermissionService) *GrpcPermissionHan
 	}
 }
 
-func (gph *GrpcPermissionHandler) CheckPermission(UserUuid, Service, Resource string) (bool, error) {
-	return gph.svc.CheckPermission(UserUuid, Service, Resource)
+func (gph *GrpcPermissionHandler) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
+	return gph.svc.CheckPermission(UserUuid, Service, Resource, Action)
 }

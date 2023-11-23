@@ -1,7 +1,7 @@
 package main
 
 import (
-	_go "api-gateway/api/v1/gen/go"
+	pb "api-gateway/api/v1/gen/go"
 	repository "api-gateway/internal/adapters/repository/postgres"
 	"api-gateway/internal/core/services"
 	"context"
@@ -22,16 +22,16 @@ const (
 
 type NoteServiceServer struct {
 	notesSvc services.NoteService
-	_go.UnimplementedNoteServer
+	pb.UnimplementedNoteServer
 }
 
-func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *_go.CreateNoteRequest) (*emptypb.Empty, error) {
+func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *pb.CreateNoteRequest) (*emptypb.Empty, error) {
 	hasPermission, err := CheckPermission(ctx, "create")
 	if err != nil || !hasPermission {
 		return nil, err
 	}
 
-	userUuid := ctx.Value("userUuid").(*_go.MeUserResponse).GetId()
+	userUuid := ctx.Value("userUuid").(*pb.MeUserResponse).GetId()
 
 	err = nss.notesSvc.Create(req.GetTitle(), req.GetContent(), userUuid)
 	if err != nil {
@@ -41,22 +41,22 @@ func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *_go.CreateNot
 	return &emptypb.Empty{}, nil
 }
 
-func (nss *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*_go.GetAllNotesResponse, error) {
+func (nss *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*pb.GetAllNotesResponse, error) {
 	notes, err := nss.notesSvc.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	var notesResponse []*_go.NoteMessage
+	var notesResponse []*pb.NoteMessage
 
 	for _, note := range notes {
-		notesResponse = append(notesResponse, &_go.NoteMessage{
+		notesResponse = append(notesResponse, &pb.NoteMessage{
 			Title:   note.Title,
 			Content: note.Content,
 		})
 	}
 
-	return &_go.GetAllNotesResponse{Notes: notesResponse}, nil
+	return &pb.GetAllNotesResponse{Notes: notesResponse}, nil
 }
 
 func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -76,8 +76,8 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 	}
 	defer usersClient.Close()
 
-	usersConn := _go.NewUserClient(usersClient)
-	userUuid, err := usersConn.UserFromToken(ctx, &_go.MeUserRequest{Token: token[0]})
+	usersConn := pb.NewUserClient(usersClient)
+	userUuid, err := usersConn.UserFromToken(ctx, &pb.MeUserRequest{Token: token[0]})
 
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid token")
@@ -90,7 +90,7 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 }
 
 func CheckPermission(ctx context.Context, Action string) (bool, error) {
-	userUuid, ok := ctx.Value("userUuid").(*_go.MeUserResponse)
+	userUuid, ok := ctx.Value("userUuid").(*pb.MeUserResponse)
 
 	if !ok {
 		return false, status.Errorf(codes.Unauthenticated, "Missing userUuid")
@@ -102,8 +102,8 @@ func CheckPermission(ctx context.Context, Action string) (bool, error) {
 	}
 	defer permissionsClient.Close()
 
-	permissionsService := _go.NewPermissionClient(permissionsClient)
-	hasPermission, err := permissionsService.CheckPermission(ctx, &_go.CheckPermissionRequest{
+	permissionsService := pb.NewPermissionClient(permissionsClient)
+	hasPermission, err := permissionsService.CheckPermission(ctx, &pb.CheckPermissionRequest{
 		UserUuid: userUuid.GetId(),
 		Service:  SERVICE,
 		Resource: RESOURCE,
@@ -137,7 +137,7 @@ func main() {
 	)))
 	grpcServer := grpc.NewServer(opts...)
 
-	_go.RegisterNoteServer(grpcServer, &server)
+	pb.RegisterNoteServer(grpcServer, &server)
 
 	log.Println("Serving Notes-service in gRPC Server on :50053")
 

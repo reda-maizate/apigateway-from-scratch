@@ -15,8 +15,8 @@ func NewGrpcNoteHandler(svc services.NoteService) *GrpcNoteHandler {
 	}
 }
 
-func (gnh *GrpcNoteHandler) Create(title, content string) error {
-	return gnh.svc.Create(title, content)
+func (gnh *GrpcNoteHandler) Create(title, content, userUuid string) error {
+	return gnh.svc.Create(title, content, userUuid)
 }
 
 func (gnh *GrpcNoteHandler) GetAll() ([]*domain.Note, error) {
