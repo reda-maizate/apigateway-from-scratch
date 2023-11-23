@@ -6,19 +6,19 @@ import (
 )
 
 type GrpcNoteHandler struct {
-	svc services.NoteService
+	noteService services.NoteService
 }
 
-func NewGrpcNoteHandler(svc services.NoteService) *GrpcNoteHandler {
+func NewGrpcNoteHandler(noteService services.NoteService) *GrpcNoteHandler {
 	return &GrpcNoteHandler{
-		svc: svc,
+		noteService: noteService,
 	}
 }
 
-func (gnh *GrpcNoteHandler) Create(title, content, userUuid string) error {
-	return gnh.svc.Create(title, content, userUuid)
+func (h *GrpcNoteHandler) Create(title, content, userUuid string) error {
+	return h.noteService.Create(title, content, userUuid)
 }
 
-func (gnh *GrpcNoteHandler) GetAll() ([]*domain.Note, error) {
-	return gnh.svc.GetAll()
+func (h *GrpcNoteHandler) GetAll() ([]*domain.Note, error) {
+	return h.noteService.GetAll()
 }

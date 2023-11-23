@@ -7,8 +7,8 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (p *APIGatewayRepository) Create(title, content, userUuid string) error {
-	queries := gen.New(p.db)
+func (r *APIGatewayRepository) Create(title, content, userUuid string) error {
+	queries := gen.New(r.db)
 
 	note_uuid := uuid.New().String()
 
@@ -21,7 +21,7 @@ func (p *APIGatewayRepository) Create(title, content, userUuid string) error {
 		CreatedBy: user_uuid_text,
 	}
 
-	_, err := queries.CreateNote(p.ctx, params)
+	_, err := queries.CreateNote(r.ctx, params)
 
 	if err != nil {
 		return err
@@ -31,10 +31,10 @@ func (p *APIGatewayRepository) Create(title, content, userUuid string) error {
 	return nil
 }
 
-func (p *APIGatewayRepository) GetAll() ([]*domain.Note, error) {
-	queries := gen.New(p.db)
+func (r *APIGatewayRepository) GetAll() ([]*domain.Note, error) {
+	queries := gen.New(r.db)
 
-	res, err := queries.GetAllNotes(p.ctx)
+	res, err := queries.GetAllNotes(r.ctx)
 
 	if err != nil {
 		return nil, err

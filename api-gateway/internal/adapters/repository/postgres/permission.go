@@ -5,8 +5,8 @@ import (
 	"slices"
 )
 
-func (p *APIGatewayRepository) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
-	queries := gen.New(p.db)
+func (r *APIGatewayRepository) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
+	queries := gen.New(r.db)
 
 	params := gen.GetUserPermissionsParams{
 		UserUuid: UserUuid,
@@ -14,7 +14,7 @@ func (p *APIGatewayRepository) CheckPermission(UserUuid, Service, Resource, Acti
 		Resource: Resource,
 	}
 
-	authorizedActions, err := queries.GetUserPermissions(p.ctx, params)
+	authorizedActions, err := queries.GetUserPermissions(r.ctx, params)
 
 	if err != nil {
 		return false, err

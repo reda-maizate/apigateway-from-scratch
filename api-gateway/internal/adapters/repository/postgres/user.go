@@ -8,10 +8,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (p *APIGatewayRepository) Login(email, password string) (string, error) {
-	queries := gen.New(p.db)
+func (r *APIGatewayRepository) Login(email, password string) (string, error) {
+	queries := gen.New(r.db)
 
-	res, err := queries.GetUser(p.ctx, email)
+	res, err := queries.GetUser(r.ctx, email)
 
 	if err != nil {
 		return "", status.Errorf(codes.InvalidArgument, "Invalid email or Password")
@@ -24,10 +24,10 @@ func (p *APIGatewayRepository) Login(email, password string) (string, error) {
 	return res.AuthToken, nil
 }
 
-func (p *APIGatewayRepository) SignUp(email, password string) (string, error) {
-	queries := gen.New(p.db)
+func (r *APIGatewayRepository) SignUp(email, password string) (string, error) {
+	queries := gen.New(r.db)
 
-	_, err := queries.GetUser(p.ctx, email)
+	_, err := queries.GetUser(r.ctx, email)
 
 	if err == nil {
 		return "", status.Errorf(codes.AlreadyExists, "Email already exists")
@@ -43,7 +43,7 @@ func (p *APIGatewayRepository) SignUp(email, password string) (string, error) {
 		AuthToken: authToken,
 	}
 
-	_, err = queries.CreateUser(p.ctx, params)
+	_, err = queries.CreateUser(r.ctx, params)
 
 	if err != nil {
 		return "", status.Errorf(codes.Internal, "Internal error while creating user")
@@ -52,10 +52,10 @@ func (p *APIGatewayRepository) SignUp(email, password string) (string, error) {
 	return authToken, nil
 }
 
-func (p *APIGatewayRepository) UserFromToken(token string) (*domain.User, error) {
-	queries := gen.New(p.db)
+func (r *APIGatewayRepository) UserFromToken(token string) (*domain.User, error) {
+	queries := gen.New(r.db)
 
-	user, err := queries.GetUserFromAuthToken(p.ctx, token)
+	user, err := queries.GetUserFromAuthToken(r.ctx, token)
 
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "User not found")

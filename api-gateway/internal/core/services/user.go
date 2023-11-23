@@ -6,23 +6,23 @@ import (
 )
 
 type UserService struct {
-	repo ports.UserRepository
+	userRepository ports.UserRepository
 }
 
 func NewUserService(repo ports.UserService) *UserService {
 	return &UserService{
-		repo: repo,
+		userRepository: repo,
 	}
 }
 
 func (s *UserService) Login(email string, password string) (string, error) {
-	return s.repo.Login(email, password)
+	return s.userRepository.Login(email, password)
 }
 
 func (s *UserService) SignUp(email string, password string) (string, error) {
-	return s.repo.SignUp(email, password)
+	return s.userRepository.SignUp(email, password)
 }
 
 func (s *UserService) UserFromToken(token string) (*domain.User, error) {
-	return s.repo.UserFromToken(token)
+	return s.userRepository.UserFromToken(token)
 }

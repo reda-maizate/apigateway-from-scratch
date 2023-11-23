@@ -6,19 +6,19 @@ import (
 )
 
 type NoteService struct {
-	repo ports.NoteRepository
+	noteRepository ports.NoteRepository
 }
 
 func NewNoteService(repo ports.NoteRepository) *NoteService {
 	return &NoteService{
-		repo: repo,
+		noteRepository: repo,
 	}
 }
 
 func (s *NoteService) Create(title, content, userUuid string) error {
-	return s.repo.Create(title, content, userUuid)
+	return s.noteRepository.Create(title, content, userUuid)
 }
 
 func (s *NoteService) GetAll() ([]*domain.Note, error) {
-	return s.repo.GetAll()
+	return s.noteRepository.GetAll()
 }

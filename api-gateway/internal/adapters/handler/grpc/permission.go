@@ -3,15 +3,15 @@ package grpc
 import "api-gateway/internal/core/services"
 
 type GrpcPermissionHandler struct {
-	svc services.PermissionService
+	permissionService services.PermissionService
 }
 
-func NewGrpcPermissionHandler(svc services.PermissionService) *GrpcPermissionHandler {
+func NewGrpcPermissionHandler(permissionService services.PermissionService) *GrpcPermissionHandler {
 	return &GrpcPermissionHandler{
-		svc: svc,
+		permissionService: permissionService,
 	}
 }
 
-func (gph *GrpcPermissionHandler) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
-	return gph.svc.CheckPermission(UserUuid, Service, Resource, Action)
+func (h *GrpcPermissionHandler) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
+	return h.permissionService.CheckPermission(UserUuid, Service, Resource, Action)
 }

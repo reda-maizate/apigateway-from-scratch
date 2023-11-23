@@ -6,23 +6,23 @@ import (
 )
 
 type GrpcUserHandler struct {
-	svc services.UserService
+	userService services.UserService
 }
 
-func NewGrpcUserHandler(svc services.UserService) *GrpcUserHandler {
+func NewGrpcUserHandler(userService services.UserService) *GrpcUserHandler {
 	return &GrpcUserHandler{
-		svc: svc,
+		userService: userService,
 	}
 }
 
-func (guh *GrpcUserHandler) Login(email, password string) (string, error) {
-	return guh.svc.Login(email, password)
+func (h *GrpcUserHandler) Login(email, password string) (string, error) {
+	return h.userService.Login(email, password)
 }
 
-func (guh *GrpcUserHandler) SignUp(email, password string) (string, error) {
-	return guh.svc.SignUp(email, password)
+func (h *GrpcUserHandler) SignUp(email, password string) (string, error) {
+	return h.userService.SignUp(email, password)
 }
 
-func (guh *GrpcUserHandler) UserFromToken(token string) (*domain.User, error) {
-	return guh.svc.UserFromToken(token)
+func (h *GrpcUserHandler) UserFromToken(token string) (*domain.User, error) {
+	return h.userService.UserFromToken(token)
 }
