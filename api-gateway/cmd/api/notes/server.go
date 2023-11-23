@@ -32,7 +32,6 @@ func (nss *NoteServiceServer) CreateNote(ctx context.Context, req *_go.CreateNot
 	}
 
 	userUuid := ctx.Value("userUuid").(*_go.MeUserResponse).GetId()
-	log.Println("UserUuid from context:", userUuid)
 
 	err = nss.notesSvc.Create(req.GetTitle(), req.GetContent(), userUuid)
 	if err != nil {
@@ -85,7 +84,7 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 	}
 
 	ctx = context.WithValue(ctx, "userUuid", userUuid)
-	log.Println("Inserted userUuid in context: ", userUuid)
+	//log.Println("Inserted userUuid in context: ", userUuid)
 
 	return handler(ctx, req)
 }
@@ -110,7 +109,7 @@ func CheckPermission(ctx context.Context, Action string) (bool, error) {
 		Resource: RESOURCE,
 	})
 
-	log.Println("PermissionsInterceptor hasPermission:", hasPermission)
+	//log.Println("PermissionsInterceptor hasPermission:", hasPermission)
 	if err != nil || !hasPermission.GetHasPermission() {
 		return false, status.Errorf(codes.PermissionDenied, "You don't have permission to create note")
 	}

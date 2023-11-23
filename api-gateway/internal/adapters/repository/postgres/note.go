@@ -5,7 +5,6 @@ import (
 	"api-gateway/internal/core/domain"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
-	"log"
 )
 
 func (p *APIGatewayRepository) Create(title, content, userUuid string) error {
@@ -14,7 +13,6 @@ func (p *APIGatewayRepository) Create(title, content, userUuid string) error {
 	note_uuid := uuid.New().String()
 
 	user_uuid_text := pgtype.Text{String: userUuid, Valid: true}
-	log.Println("Converted user uuid text:", user_uuid_text)
 
 	params := gen.CreateNoteParams{
 		Uuid:      note_uuid,
@@ -29,7 +27,7 @@ func (p *APIGatewayRepository) Create(title, content, userUuid string) error {
 		return err
 	}
 
-	log.Println("New note created :", title)
+	//log.Println("New note created :", title)
 	return nil
 }
 

@@ -16,8 +16,6 @@ type PermissionServiceServer struct {
 }
 
 func (pss *PermissionServiceServer) CheckPermission(ctx context.Context, req *_go.CheckPermissionRequest) (*_go.CheckPermissionResponse, error) {
-	log.Println("CheckPermission 1:", req)
-	log.Println("CheckPermission 2 ctx:", ctx)
 	HasPermission, err := pss.svc.CheckPermission(req.UserUuid, req.Service, req.Resource, req.Action)
 	if err != nil {
 		return nil, err
@@ -25,35 +23,6 @@ func (pss *PermissionServiceServer) CheckPermission(ctx context.Context, req *_g
 
 	return &_go.CheckPermissionResponse{HasPermission: HasPermission}, nil
 }
-
-//func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, gatewayRepository *repository.APIGatewayRepository) (interface{}, error) {
-//	md, ok := metadata.FromIncomingContext(ctx)
-//	if !ok {
-//		return nil, status.Errorf(codes.Unauthenticated, "Missing context metadata")
-//	}
-//
-//	log.Println("ctx 2", ctx)
-//	token := md["authorization"]
-//	if len(token) == 0 {
-//		return nil, status.Errorf(codes.Unauthenticated, "Missing authorization token")
-//	}
-//
-//	usersClient, err := grpc.Dial("users_service:50052", grpc.WithInsecure())
-//	if err != nil {
-//		log.Fatalf("Failed to dial Users-service gRPC server: %v", err)
-//	}
-//	defer usersClient.Close()
-//
-//	usersService := _go.NewUserClient(usersClient)
-//	userUuid, err := usersService.UserFromToken(ctx, &_go.MeUserRequest{Token: token[0]})
-//	if err != nil {
-//		return nil, status.Errorf(codes.Unauthenticated, "Invalid token")
-//	}
-//
-//	ctx = context.WithValue(ctx, "userUuid", userUuid)
-//
-//	return handler(ctx, req)
-//}
 
 func main() {
 	listener, err := net.Listen("tcp", ":50054")
@@ -67,10 +36,6 @@ func main() {
 
 	server := PermissionServiceServer{svc: *svc}
 
-	//var opts []grpc.ServerOption
-	//opts = append(opts, grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	//	return AuthInterceptor(ctx, req, info, handler, store)
-	//}))
 	grpcServer := grpc.NewServer()
 
 	_go.RegisterPermissionServer(grpcServer, &server)
