@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	SERVICE  = "notes"
-	RESOURCE = "note"
+	Service  = "notes"
+	Resource = "note"
 )
 
 type NoteServiceServer struct {
@@ -105,8 +105,8 @@ func CheckPermission(ctx context.Context, Action string) (bool, error) {
 	permissionsService := pb.NewPermissionClient(permissionsClient)
 	hasPermission, err := permissionsService.CheckPermission(ctx, &pb.CheckPermissionRequest{
 		UserUuid: userUuid.GetId(),
-		Service:  SERVICE,
-		Resource: RESOURCE,
+		Service:  Service,
+		Resource: Resource,
 	})
 
 	//log.Println("PermissionsInterceptor hasPermission:", hasPermission)
