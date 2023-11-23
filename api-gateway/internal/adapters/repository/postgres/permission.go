@@ -1,8 +1,12 @@
 package postgres
 
-import gen "api-gateway/internal/adapters/repository/postgres/gen"
+import (
+	gen "api-gateway/internal/adapters/repository/postgres/gen"
+	"log"
+	"slices"
+)
 
-func (p *APIGatewayRepository) CheckPermission(UserUuid string, Service string, Resource string) (bool, error) {
+func (p *APIGatewayRepository) CheckPermission(UserUuid, Service, Resource, Action string) (bool, error) {
 	queries := gen.New(p.db)
 
 	params := gen.GetUserPermissionsParams{
@@ -10,10 +14,17 @@ func (p *APIGatewayRepository) CheckPermission(UserUuid string, Service string, 
 		Service:  Service,
 		Resource: Resource,
 	}
-	_, err := queries.GetUserPermissions(p.ctx, params)
 
+	log.Println("CheckPermission 3", UserUuid, Service, Resource)
+	authorizedActions, err := queries.GetUserPermissions(p.ctx, params)
+
+	log.Println("CheckPermission 4", authorizedActions)
 	if err != nil {
 		return false, err
+	}
+
+	if slices.Contains(authorizedActions, Action) {
+		return true, nil
 	}
 
 	return true, nil

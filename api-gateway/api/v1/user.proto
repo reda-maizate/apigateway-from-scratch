@@ -20,6 +20,14 @@ message SignUpRequest {
   string password = 2;
 }
 
+message MeUserRequest {
+  string token = 1;
+}
+
+message MeUserResponse {
+  string id = 2;
+}
+
 
 service User {
   rpc SignUp (SignUpRequest) returns (UserResponse) {
@@ -34,4 +42,5 @@ service User {
       body: "*"
     };
   }
+  rpc UserFromToken (MeUserRequest) returns (MeUserResponse);
 }

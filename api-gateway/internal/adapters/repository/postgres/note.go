@@ -4,18 +4,23 @@ import (
 	gen "api-gateway/internal/adapters/repository/postgres/gen"
 	"api-gateway/internal/core/domain"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	"log"
 )
 
-func (p *APIGatewayRepository) Create(title, content string) error {
+func (p *APIGatewayRepository) Create(title, content, userUuid string) error {
 	queries := gen.New(p.db)
 
 	note_uuid := uuid.New().String()
 
+	user_uuid_text := pgtype.Text{String: userUuid, Valid: true}
+	log.Println("Converted user uuid text:", user_uuid_text)
+
 	params := gen.CreateNoteParams{
-		Uuid:    note_uuid,
-		Title:   title,
-		Content: content,
+		Uuid:      note_uuid,
+		Title:     title,
+		Content:   content,
+		CreatedBy: user_uuid_text,
 	}
 
 	_, err := queries.CreateNote(p.ctx, params)

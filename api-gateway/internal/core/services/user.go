@@ -1,6 +1,7 @@
 package services
 
 import (
+	"api-gateway/internal/core/domain"
 	"api-gateway/internal/core/ports"
 )
 
@@ -20,4 +21,8 @@ func (s *UserService) Login(email string, password string) (string, error) {
 
 func (s *UserService) SignUp(email string, password string) (string, error) {
 	return s.repo.SignUp(email, password)
+}
+
+func (s *UserService) UserFromToken(token string) (*domain.User, error) {
+	return s.repo.UserFromToken(token)
 }

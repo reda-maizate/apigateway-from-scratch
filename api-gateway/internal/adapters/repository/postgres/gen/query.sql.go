@@ -7,24 +7,37 @@ package postgres
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createNote = `-- name: CreateNote :one
-INSERT INTO Notes (uuid, title, content)
-VALUES ($1, $2, $3)
-RETURNING uuid, title, content
+INSERT INTO Notes (uuid, title, content, created_by)
+VALUES ($1, $2, $3, $4)
+RETURNING uuid, title, content, created_by
 `
 
 type CreateNoteParams struct {
-	Uuid    string
-	Title   string
-	Content string
+	Uuid      string
+	Title     string
+	Content   string
+	CreatedBy pgtype.Text
 }
 
 func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error) {
-	row := q.db.QueryRow(ctx, createNote, arg.Uuid, arg.Title, arg.Content)
+	row := q.db.QueryRow(ctx, createNote,
+		arg.Uuid,
+		arg.Title,
+		arg.Content,
+		arg.CreatedBy,
+	)
 	var i Note
-	err := row.Scan(&i.Uuid, &i.Title, &i.Content)
+	err := row.Scan(
+		&i.Uuid,
+		&i.Title,
+		&i.Content,
+		&i.CreatedBy,
+	)
 	return i, err
 }
 
@@ -59,7 +72,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getAllNotes = `-- name: GetAllNotes :many
-SELECT uuid, title, content
+SELECT uuid, title, content, created_by
 FROM Notes
 `
 
@@ -72,7 +85,12 @@ func (q *Queries) GetAllNotes(ctx context.Context) ([]Note, error) {
 	var items []Note
 	for rows.Next() {
 		var i Note
-		if err := rows.Scan(&i.Uuid, &i.Title, &i.Content); err != nil {
+		if err := rows.Scan(
+			&i.Uuid,
+			&i.Title,
+			&i.Content,
+			&i.CreatedBy,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -101,14 +119,14 @@ func (q *Queries) GetUser(ctx context.Context, email string) (User, error) {
 	return i, err
 }
 
-const getUserByAuthToken = `-- name: GetUserByAuthToken :one
+const getUserFromAuthToken = `-- name: GetUserFromAuthToken :one
 SELECT uuid, email, password, auth_token
 FROM Users
 WHERE auth_token = $1
 `
 
-func (q *Queries) GetUserByAuthToken(ctx context.Context, authToken string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByAuthToken, authToken)
+func (q *Queries) GetUserFromAuthToken(ctx context.Context, authToken string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserFromAuthToken, authToken)
 	var i User
 	err := row.Scan(
 		&i.Uuid,

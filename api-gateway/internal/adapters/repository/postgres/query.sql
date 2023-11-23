@@ -1,6 +1,6 @@
 -- name: CreateNote :one
-INSERT INTO Notes (uuid, title, content)
-VALUES ($1, $2, $3)
+INSERT INTO Notes (uuid, title, content, created_by)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetAllNotes :many
@@ -17,7 +17,7 @@ SELECT *
 FROM Users
 WHERE email = $1;
 
--- name: GetUserByAuthToken :one
+-- name: GetUserFromAuthToken :one
 SELECT *
 FROM Users
 WHERE auth_token = $1;

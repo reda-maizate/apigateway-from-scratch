@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"api-gateway/internal/core/domain"
 	"api-gateway/internal/core/services"
 )
 
@@ -20,4 +21,8 @@ func (guh *GrpcUserHandler) Login(email, password string) (string, error) {
 
 func (guh *GrpcUserHandler) SignUp(email, password string) (string, error) {
 	return guh.svc.SignUp(email, password)
+}
+
+func (guh *GrpcUserHandler) UserFromToken(token string) (*domain.User, error) {
+	return guh.svc.UserFromToken(token)
 }

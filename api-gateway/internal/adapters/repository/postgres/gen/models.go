@@ -4,12 +4,15 @@
 
 package postgres
 
-import ()
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
 
 type Note struct {
-	Uuid    string
-	Title   string
-	Content string
+	Uuid      string
+	Title     string
+	Content   string
+	CreatedBy pgtype.Text
 }
 
 type Permission struct {

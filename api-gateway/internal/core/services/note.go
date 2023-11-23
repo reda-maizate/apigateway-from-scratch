@@ -15,8 +15,8 @@ func NewNoteService(repo ports.NoteRepository) *NoteService {
 	}
 }
 
-func (s *NoteService) Create(title, content string) error {
-	return s.repo.Create(title, content)
+func (s *NoteService) Create(title, content, userUuid string) error {
+	return s.repo.Create(title, content, userUuid)
 }
 
 func (s *NoteService) GetAll() ([]*domain.Note, error) {
