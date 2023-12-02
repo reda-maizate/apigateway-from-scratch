@@ -1,8 +1,8 @@
 buf:
-	cd ./api/v1/ && buf generate && cd ./../../;
+	cd ./proto/ && buf generate && cd ./../;
 
 sqlc:
-	cd ./internal/adapters/repository/postgres/ && sqlc generate && cd ./../../../../;
+	cd ./internal/db/ && sqlc generate && cd ./../../;
 
 run:
 	 docker-compose build --no-cache && docker-compose up

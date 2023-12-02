@@ -1,10 +1,10 @@
 package main
 
 import (
-	pb "api-gateway/api/v1/gen/go"
-	repository "api-gateway/internal/adapters/repository/postgres"
 	"api-gateway/internal/core/ports"
 	"api-gateway/internal/core/services"
+	repository "api-gateway/internal/db"
+	permissionstubs "api-gateway/stubs/go/apigateway-from-scratch/permissions/v1"
 	"context"
 	"google.golang.org/grpc"
 	"log"
@@ -13,14 +13,14 @@ import (
 
 type PermissionServiceServer struct {
 	permissionService services.PermissionService
-	pb.UnimplementedPermissionServer
+	permissionstubs.UnimplementedPermissionServer
 }
 
-func NewPermissionServiceServer(permissionService *services.PermissionService) pb.PermissionServer {
+func NewPermissionServiceServer(permissionService *services.PermissionService) permissionstubs.PermissionServer {
 	return &PermissionServiceServer{permissionService: *permissionService}
 }
 
-func (s *PermissionServiceServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
+func (s *PermissionServiceServer) CheckPermission(ctx context.Context, req *permissionstubs.CheckPermissionRequest) (*permissionstubs.CheckPermissionResponse, error) {
 	checkPermissionParams := ports.CheckPermissionParams{
 		UserUuid: req.UserUuid,
 		Service:  req.Service,
@@ -33,7 +33,7 @@ func (s *PermissionServiceServer) CheckPermission(ctx context.Context, req *pb.C
 		return nil, err
 	}
 
-	return &pb.CheckPermissionResponse{
+	return &permissionstubs.CheckPermissionResponse{
 		HasPermission: HasPermission.Authorized,
 	}, nil
 }
@@ -52,7 +52,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	pb.RegisterPermissionServer(grpcServer, server)
+	permissionstubs.RegisterPermissionServer(grpcServer, server)
 
 	log.Println("Serving Permissions-service in gRPC Server on :50054")
 

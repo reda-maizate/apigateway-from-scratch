@@ -1,10 +1,12 @@
 package main
 
 import (
-	pb "api-gateway/api/v1/gen/go"
-	repository "api-gateway/internal/adapters/repository/postgres"
 	"api-gateway/internal/core/ports"
 	"api-gateway/internal/core/services"
+	repository "api-gateway/internal/db"
+	notestubs "api-gateway/stubs/go/apigateway-from-scratch/notes/v1"
+	permissionsstubs "api-gateway/stubs/go/apigateway-from-scratch/permissions/v1"
+	userstubs "api-gateway/stubs/go/apigateway-from-scratch/users/v1"
 	"context"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
@@ -23,20 +25,20 @@ const (
 
 type NoteServiceServer struct {
 	notesService services.NoteService
-	pb.UnimplementedNoteServer
+	notestubs.UnimplementedNoteServer
 }
 
-func NewNoteServiceServer(notesService *services.NoteService) pb.NoteServer {
+func NewNoteServiceServer(notesService *services.NoteService) notestubs.NoteServer {
 	return &NoteServiceServer{notesService: *notesService}
 }
 
-func (s *NoteServiceServer) CreateNote(ctx context.Context, req *pb.CreateNoteRequest) (*emptypb.Empty, error) {
+func (s *NoteServiceServer) CreateNote(ctx context.Context, req *notestubs.CreateNoteRequest) (*emptypb.Empty, error) {
 	hasPermission, err := CheckPermission(ctx, "create")
 	if err != nil || !hasPermission {
 		return nil, err
 	}
 
-	userUuid := ctx.Value("userUuid").(*pb.MeUserResponse).GetId()
+	userUuid := ctx.Value("userUuid").(*userstubs.MeUserResponse).GetId()
 
 	createNoteParams := ports.CreateNoteParams{
 		Title:    req.GetTitle(),
@@ -51,22 +53,22 @@ func (s *NoteServiceServer) CreateNote(ctx context.Context, req *pb.CreateNoteRe
 	return &emptypb.Empty{}, nil
 }
 
-func (s *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*pb.GetAllNotesResponse, error) {
+func (s *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*notestubs.GetAllNotesResponse, error) {
 	notes, err := s.notesService.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	var notesResponse []*pb.NoteMessage
+	var notesResponse []*notestubs.NoteMessage
 
 	for _, note := range notes.Notes {
-		notesResponse = append(notesResponse, &pb.NoteMessage{
+		notesResponse = append(notesResponse, &notestubs.NoteMessage{
 			Title:   note.Title,
 			Content: note.Content,
 		})
 	}
 
-	return &pb.GetAllNotesResponse{Notes: notesResponse}, nil
+	return &notestubs.GetAllNotesResponse{Notes: notesResponse}, nil
 }
 
 func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -86,8 +88,8 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 	}
 	defer usersClient.Close()
 
-	usersConn := pb.NewUserClient(usersClient)
-	userUuid, err := usersConn.UserFromToken(ctx, &pb.MeUserRequest{Token: token[0]})
+	usersConn := userstubs.NewUserClient(usersClient)
+	userUuid, err := usersConn.UserFromToken(ctx, &userstubs.MeUserRequest{Token: token[0]})
 
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid token")
@@ -100,7 +102,7 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 }
 
 func CheckPermission(ctx context.Context, Action string) (bool, error) {
-	userUuid, ok := ctx.Value("userUuid").(*pb.MeUserResponse)
+	userUuid, ok := ctx.Value("userUuid").(*userstubs.MeUserResponse)
 
 	if !ok {
 		return false, status.Errorf(codes.Unauthenticated, "Missing userUuid")
@@ -112,8 +114,8 @@ func CheckPermission(ctx context.Context, Action string) (bool, error) {
 	}
 	defer permissionsClient.Close()
 
-	permissionsService := pb.NewPermissionClient(permissionsClient)
-	hasPermission, err := permissionsService.CheckPermission(ctx, &pb.CheckPermissionRequest{
+	permissionsService := permissionsstubs.NewPermissionClient(permissionsClient)
+	hasPermission, err := permissionsService.CheckPermission(ctx, &permissionsstubs.CheckPermissionRequest{
 		UserUuid: userUuid.GetId(),
 		Service:  Service,
 		Resource: Resource,
@@ -149,7 +151,7 @@ func main() {
 	)))
 	grpcServer := grpc.NewServer(opts...)
 
-	pb.RegisterNoteServer(grpcServer, server)
+	notestubs.RegisterNoteServer(grpcServer, server)
 
 	log.Println("Serving Notes-service in gRPC Server on :50053")
 

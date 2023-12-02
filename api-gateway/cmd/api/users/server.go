@@ -1,10 +1,10 @@
 package main
 
 import (
-	pb "api-gateway/api/v1/gen/go"
-	repository "api-gateway/internal/adapters/repository/postgres"
 	"api-gateway/internal/core/ports"
 	"api-gateway/internal/core/services"
+	repository "api-gateway/internal/db"
+	userstubs "api-gateway/stubs/go/apigateway-from-scratch/users/v1"
 	"context"
 	"google.golang.org/grpc"
 	"log"
@@ -13,14 +13,14 @@ import (
 
 type UserServiceServer struct {
 	userService services.UserService
-	pb.UnimplementedUserServer
+	userstubs.UnimplementedUserServer
 }
 
-func NewUserServiceServer(userService *services.UserService) pb.UserServer {
+func NewUserServiceServer(userService *services.UserService) userstubs.UserServer {
 	return &UserServiceServer{userService: *userService}
 }
 
-func (s *UserServiceServer) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.UserResponse, error) {
+func (s *UserServiceServer) SignUp(ctx context.Context, req *userstubs.SignUpRequest) (*userstubs.UserResponse, error) {
 	signUpParams := ports.UserParams{
 		Email:    req.Email,
 		Password: req.Password,
@@ -31,10 +31,10 @@ func (s *UserServiceServer) SignUp(ctx context.Context, req *pb.SignUpRequest) (
 		return nil, err
 	}
 
-	return &pb.UserResponse{Token: userResponse.Token}, nil
+	return &userstubs.UserResponse{Token: userResponse.Token}, nil
 }
 
-func (s *UserServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.UserResponse, error) {
+func (s *UserServiceServer) Login(ctx context.Context, req *userstubs.LoginRequest) (*userstubs.UserResponse, error) {
 	logInParams := ports.UserParams{
 		Email:    req.Email,
 		Password: req.Password,
@@ -45,10 +45,10 @@ func (s *UserServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*p
 		return nil, err
 	}
 
-	return &pb.UserResponse{Token: userResponse.Token}, nil
+	return &userstubs.UserResponse{Token: userResponse.Token}, nil
 }
 
-func (s *UserServiceServer) UserFromToken(ctx context.Context, req *pb.MeUserRequest) (*pb.MeUserResponse, error) {
+func (s *UserServiceServer) UserFromToken(ctx context.Context, req *userstubs.MeUserRequest) (*userstubs.MeUserResponse, error) {
 	userFromTokenParams := ports.UserFromTokenParams{
 		Token: req.Token,
 	}
@@ -57,7 +57,7 @@ func (s *UserServiceServer) UserFromToken(ctx context.Context, req *pb.MeUserReq
 		return nil, err
 	}
 
-	return &pb.MeUserResponse{Id: userFromTokenResponse.User.Uuid}, nil
+	return &userstubs.MeUserResponse{Id: userFromTokenResponse.User.Uuid}, nil
 }
 
 func main() {
@@ -74,7 +74,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	pb.RegisterUserServer(grpcServer, server)
+	userstubs.RegisterUserServer(grpcServer, server)
 
 	log.Println("Serving User-service in gRPC Server on :50052")
 

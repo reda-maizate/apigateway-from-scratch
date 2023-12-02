@@ -8,7 +8,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 
-	pb "api-gateway/api/v1/gen/go"
+	notestubs "api-gateway/stubs/go/apigateway-from-scratch/notes/v1"
+	userstubs "api-gateway/stubs/go/apigateway-from-scratch/users/v1"
 )
 
 func main() {
@@ -19,8 +20,8 @@ func main() {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	err_user := pb.RegisterUserHandlerFromEndpoint(ctx, mux, "users_service:50052", opts)
-	err_note := pb.RegisterNoteHandlerFromEndpoint(ctx, mux, "notes_service:50053", opts)
+	err_user := userstubs.RegisterUserHandlerFromEndpoint(ctx, mux, "users_service:50052", opts)
+	err_note := notestubs.RegisterNoteHandlerFromEndpoint(ctx, mux, "notes_service:50053", opts)
 
 	if err_user != nil {
 		log.Fatalf("failed to start HTTP user server: %v", err_user)

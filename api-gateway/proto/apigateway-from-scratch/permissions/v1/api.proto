@@ -23,7 +23,7 @@ message CheckPermissionRequest {
 }
 
 message CheckPermissionResponse {
- bool has_permission = 1;
+ bool authorized = 1;
 }
 
 service Permission {
