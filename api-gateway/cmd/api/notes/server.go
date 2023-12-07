@@ -1,135 +1,30 @@
 package main
 
 import (
-	"api-gateway/internal/core/ports"
-	"api-gateway/internal/core/services"
+	"api-gateway/internal/business/core"
+	"api-gateway/internal/business/notes"
 	repository "api-gateway/internal/db"
+	"api-gateway/internal/env"
+	"api-gateway/internal/middlewares"
+	rpcNotes "api-gateway/internal/rpc/notes/v1"
 	notestubs "api-gateway/stubs/go/apigateway-from-scratch/notes/v1"
-	permissionsstubs "api-gateway/stubs/go/apigateway-from-scratch/permissions/v1"
-	userstubs "api-gateway/stubs/go/apigateway-from-scratch/users/v1"
-	"context"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"net"
 )
 
-const (
-	Service  = "notes"
-	Resource = "note"
+//const (
+//	Service  = "notes"
+//	Resource = "note"
+//)
+
+var (
+	ENV_DB_USERNAME = env.Get("DB_USERNAME", "")
+	ENV_DB_PASSWORD = env.Get("DB_PASSWORD", "")
+	ENV_DB_NAME     = env.Get("DB_NAME", "")
+	ENV_DB_PORT     = env.Get("DB_PORT", "")
 )
-
-type NoteServiceServer struct {
-	notesService services.NoteService
-	notestubs.UnimplementedNoteServer
-}
-
-func NewNoteServiceServer(notesService *services.NoteService) notestubs.NoteServer {
-	return &NoteServiceServer{notesService: *notesService}
-}
-
-func (s *NoteServiceServer) CreateNote(ctx context.Context, req *notestubs.CreateNoteRequest) (*emptypb.Empty, error) {
-	hasPermission, err := CheckPermission(ctx, "create")
-	if err != nil || !hasPermission {
-		return nil, err
-	}
-
-	userUuid := ctx.Value("userUuid").(*userstubs.MeUserResponse).GetId()
-
-	createNoteParams := ports.CreateNoteParams{
-		Title:    req.GetTitle(),
-		Content:  req.GetContent(),
-		UserUuid: userUuid,
-	}
-	err = s.notesService.Create(createNoteParams)
-	if err != nil {
-		return nil, err
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
-func (s *NoteServiceServer) GetAllNotes(ctx context.Context, req *emptypb.Empty) (*notestubs.GetAllNotesResponse, error) {
-	notes, err := s.notesService.GetAll()
-	if err != nil {
-		return nil, err
-	}
-
-	var notesResponse []*notestubs.NoteMessage
-
-	for _, note := range notes.Notes {
-		notesResponse = append(notesResponse, &notestubs.NoteMessage{
-			Title:   note.Title,
-			Content: note.Content,
-		})
-	}
-
-	return &notestubs.GetAllNotesResponse{Notes: notesResponse}, nil
-}
-
-func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "Missing context metadata")
-	}
-
-	token := md["authorization"]
-	if len(token) == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Missing authorization token")
-	}
-
-	usersClient, err := grpc.Dial("users_service:50052", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Failed to dial Users-service gRPC server: %v", err)
-	}
-	defer usersClient.Close()
-
-	usersConn := userstubs.NewUserClient(usersClient)
-	userUuid, err := usersConn.UserFromToken(ctx, &userstubs.MeUserRequest{Token: token[0]})
-
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "Invalid token")
-	}
-
-	ctx = context.WithValue(ctx, "userUuid", userUuid)
-	//log.Println("Inserted userUuid in context: ", userUuid)
-
-	return handler(ctx, req)
-}
-
-func CheckPermission(ctx context.Context, Action string) (bool, error) {
-	userUuid, ok := ctx.Value("userUuid").(*userstubs.MeUserResponse)
-
-	if !ok {
-		return false, status.Errorf(codes.Unauthenticated, "Missing userUuid")
-	}
-
-	permissionsClient, err := grpc.Dial("permissions_service:50054", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Failed to dial Permissions-service gRPC server: %v", err)
-	}
-	defer permissionsClient.Close()
-
-	permissionsService := permissionsstubs.NewPermissionClient(permissionsClient)
-	hasPermission, err := permissionsService.CheckPermission(ctx, &permissionsstubs.CheckPermissionRequest{
-		UserUuid: userUuid.GetId(),
-		Service:  Service,
-		Resource: Resource,
-		Action:   Action,
-	})
-
-	//log.Println("PermissionsInterceptor hasPermission:", hasPermission)
-	if err != nil || !hasPermission.GetHasPermission() {
-		log.Println("PermissionsInterceptor hasPermission:", hasPermission, "/ err:", err)
-		return false, status.Errorf(codes.PermissionDenied, "You don't have permission to create note")
-	}
-
-	return true, nil
-}
 
 func main() {
 	listener, err := net.Listen("tcp", ":50053")
@@ -138,20 +33,35 @@ func main() {
 		log.Fatalln("Failed to listen:", err)
 	}
 
-	store := repository.NewAPIGatewayRepository()
-	notesService := services.NewNoteService(store)
+	dbConfig := &repository.DBConfig{
+		Username: ENV_DB_USERNAME,
+		Password: ENV_DB_PASSWORD,
+		Dbname:   ENV_DB_NAME,
+		Port:     ENV_DB_PORT,
+	}
 
-	server := NewNoteServiceServer(notesService)
+	store := repository.NewDB(dbConfig)
+
+	coreBusinessConfig := &core.CoreBusinessConfig{
+		DB:      store.Db,
+		Queries: store.Queries,
+		Ctx:     store.Ctx,
+	}
+
+	notesBusinessConfig := &notes.NotesBusinessConfig{}
+	notesBusiness := notes.NewNotesBusiness(coreBusinessConfig, notesBusinessConfig)
+
+	notesService := rpcNotes.NewNoteServiceServer(notesBusiness)
 
 	var opts []grpc.ServerOption
 	opts = append(opts, grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 		grpc.UnaryServerInterceptor(
-			AuthInterceptor,
+			middlewares.AuthInterceptor,
 		),
 	)))
 	grpcServer := grpc.NewServer(opts...)
 
-	notestubs.RegisterNoteServer(grpcServer, server)
+	notestubs.RegisterNoteServer(grpcServer, &notesService)
 
 	log.Println("Serving Notes-service in gRPC Server on :50053")
 

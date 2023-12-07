@@ -54,7 +54,7 @@ If the user is successfully logged in, you should get a response like this:
 
 #### Notes service
 
-To create a new note, send a POST request to `localhost:8080/v1/notes/create` with a header `authorization` with the value `<your_auth_token>` and the following body:
+To create a new note, send a POST request to `localhost:8080/v1/notes/create` with a header `Authorization` with the value `<your_auth_token>` and the following body:
 
 ```json
 {
@@ -69,7 +69,7 @@ If the note is successfully created, you should get a response like this:
 {}
 ```
 ----
-To get all notes, send a GET request to `localhost:8080/v1/notes` with a header `authorization` with the value `<your_auth_token>`.
+To get all notes, send a GET request to `localhost:8080/v1/notes` with a header `Authorization` with the value `<your_auth_token>`.
 
 If the notes are successfully retrieved, you should get a response like this:
 

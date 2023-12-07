@@ -13,7 +13,7 @@ type UsersBusiness struct {
 
 type UsersBusinessConfig struct{}
 
-func NewPermissionsBusiness(coreConfig *core_business.CoreBusinessConfig, config *UsersBusinessConfig) *UsersBusiness {
+func NewUsersBusiness(coreConfig *core_business.CoreBusinessConfig, config *UsersBusinessConfig) *UsersBusiness {
 	return &UsersBusiness{
 		db:      coreConfig.DB,
 		queries: coreConfig.Queries,

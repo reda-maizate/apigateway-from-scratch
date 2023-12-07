@@ -16,8 +16,10 @@ func (b *NotesBusiness) GetAllNotes(ctx context.Context) ([]*database.Note, erro
 
 	for _, note := range res {
 		notes = append(notes, &database.Note{
-			Title:   note.Title,
-			Content: note.Content,
+			Uuid:      note.Uuid,
+			Title:     note.Title,
+			Content:   note.Content,
+			CreatedBy: note.CreatedBy,
 		})
 	}
 

@@ -1,64 +1,23 @@
 package main
 
 import (
-	"api-gateway/internal/core/ports"
-	"api-gateway/internal/core/services"
+	"api-gateway/internal/business/core"
+	"api-gateway/internal/business/users"
 	repository "api-gateway/internal/db"
+	"api-gateway/internal/env"
+	rpcUsers "api-gateway/internal/rpc/users/v1"
 	userstubs "api-gateway/stubs/go/apigateway-from-scratch/users/v1"
-	"context"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 )
 
-type UserServiceServer struct {
-	userService services.UserService
-	userstubs.UnimplementedUserServer
-}
-
-func NewUserServiceServer(userService *services.UserService) userstubs.UserServer {
-	return &UserServiceServer{userService: *userService}
-}
-
-func (s *UserServiceServer) SignUp(ctx context.Context, req *userstubs.SignUpRequest) (*userstubs.UserResponse, error) {
-	signUpParams := ports.UserParams{
-		Email:    req.Email,
-		Password: req.Password,
-	}
-
-	userResponse, err := s.userService.SignUp(signUpParams)
-	if err != nil {
-		return nil, err
-	}
-
-	return &userstubs.UserResponse{Token: userResponse.Token}, nil
-}
-
-func (s *UserServiceServer) Login(ctx context.Context, req *userstubs.LoginRequest) (*userstubs.UserResponse, error) {
-	logInParams := ports.UserParams{
-		Email:    req.Email,
-		Password: req.Password,
-	}
-
-	userResponse, err := s.userService.Login(logInParams)
-	if err != nil {
-		return nil, err
-	}
-
-	return &userstubs.UserResponse{Token: userResponse.Token}, nil
-}
-
-func (s *UserServiceServer) UserFromToken(ctx context.Context, req *userstubs.MeUserRequest) (*userstubs.MeUserResponse, error) {
-	userFromTokenParams := ports.UserFromTokenParams{
-		Token: req.Token,
-	}
-	userFromTokenResponse, err := s.userService.UserFromToken(userFromTokenParams)
-	if err != nil {
-		return nil, err
-	}
-
-	return &userstubs.MeUserResponse{Id: userFromTokenResponse.User.Uuid}, nil
-}
+var (
+	ENV_DB_USERNAME = env.Get("DB_USERNAME", "")
+	ENV_DB_PASSWORD = env.Get("DB_PASSWORD", "")
+	ENV_DB_NAME     = env.Get("DB_NAME", "")
+	ENV_DB_PORT     = env.Get("DB_PORT", "")
+)
 
 func main() {
 	listener, err := net.Listen("tcp", ":50052")
@@ -67,14 +26,29 @@ func main() {
 		log.Fatalln("Failed to listen:", err)
 	}
 
-	store := repository.NewAPIGatewayRepository()
-	userService := services.NewUserService(store)
+	dbConfig := &repository.DBConfig{
+		Username: ENV_DB_USERNAME,
+		Password: ENV_DB_PASSWORD,
+		Dbname:   ENV_DB_NAME,
+		Port:     ENV_DB_PORT,
+	}
 
-	server := NewUserServiceServer(userService)
+	store := repository.NewDB(dbConfig)
+
+	coreBusinessConfig := &core.CoreBusinessConfig{
+		DB:      store.Db,
+		Queries: store.Queries,
+		Ctx:     store.Ctx,
+	}
+
+	userBusinessConfig := &users.UsersBusinessConfig{}
+	userBusiness := users.NewUsersBusiness(coreBusinessConfig, userBusinessConfig)
+
+	userService := rpcUsers.NewUserServiceServer(userBusiness)
 
 	grpcServer := grpc.NewServer()
 
-	userstubs.RegisterUserServer(grpcServer, server)
+	userstubs.RegisterUserServer(grpcServer, userService)
 
 	log.Println("Serving User-service in gRPC Server on :50052")
 

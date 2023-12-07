@@ -5,30 +5,30 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"log"
-	"os"
 )
 
-var (
-	Username = os.Getenv("POSTGRES_USER")
-	Password = os.Getenv("POSTGRES_PASSWORD")
-	Dbname   = os.Getenv("POSTGRES_DB")
-)
-
-type APIGatewayRepository struct {
-	db  *pgx.Conn
-	ctx context.Context
+type DBConfig struct {
+	Username string
+	Password string
+	Dbname   string
+	Port     string
 }
 
-func NewAPIGatewayRepository() *APIGatewayRepository {
+type DB struct {
+	Db      *pgx.Conn
+	Ctx     context.Context
+	Queries *Queries
+}
+
+func NewDB(config *DBConfig) *DB {
 	host := "host.docker.internal"
-	port := "5432"
 
 	conn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		host,
-		port,
-		Username,
-		Dbname,
-		Password,
+		config.Port,
+		config.Username,
+		config.Dbname,
+		config.Password,
 	)
 
 	ctx := context.Background()
@@ -39,8 +39,9 @@ func NewAPIGatewayRepository() *APIGatewayRepository {
 		panic(err)
 	}
 
-	return &APIGatewayRepository{
-		db:  db,
-		ctx: ctx,
+	return &DB{
+		Db:      db,
+		Ctx:     ctx,
+		Queries: New(db),
 	}
 }

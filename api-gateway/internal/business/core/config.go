@@ -8,6 +8,6 @@ import (
 
 type CoreBusinessConfig struct {
 	DB      *pgx.Conn
-	CTX     context.Context
+	Ctx     context.Context
 	Queries *database.Queries
 }

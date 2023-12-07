@@ -6,9 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile-db
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: apigateway
+      DB_USERNAME: admin
+      DB_PASSWORD: postgres
+      DB_NAME: apigateway
+      DB_PORT: 5432
     ports:
       - 5432:5432
     healthcheck:
@@ -25,9 +26,10 @@ services:
     ports:
       - 8080:8080
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: apigateway
+      DB_USERNAME: admin
+      DB_PASSWORD: postgres
+      DB_NAME: apigateway
+      DB_PORT: 5432
     depends_on:
       db:
         condition: service_healthy
@@ -40,9 +42,10 @@ services:
     ports:
       - 50053:50053
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: apigateway
+      DB_USERNAME: admin
+      DB_PASSWORD: postgres
+      DB_NAME: apigateway
+      DB_PORT: 5432
     depends_on:
       db:
         condition: service_healthy
@@ -55,9 +58,10 @@ services:
     ports:
       - 50052:50052
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: apigateway
+      DB_USERNAME: admin
+      DB_PASSWORD: postgres
+      DB_NAME: apigateway
+      DB_PORT: 5432
     depends_on:
       db:
         condition: service_healthy
@@ -70,9 +74,10 @@ services:
     ports:
       - 50054:50054
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: apigateway
+      DB_USERNAME: admin
+      DB_PASSWORD: postgres
+      DB_NAME: apigateway
+      DB_PORT: 5432
     depends_on:
       db:
         condition: service_healthy

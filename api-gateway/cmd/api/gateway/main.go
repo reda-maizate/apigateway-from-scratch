@@ -1,6 +1,7 @@
 package main
 
 import (
+	userstubs "api-gateway/stubs/go/apigateway-from-scratch/users/v1"
 	"context"
 	"log"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"google.golang.org/grpc"
 
 	notestubs "api-gateway/stubs/go/apigateway-from-scratch/notes/v1"
-	userstubs "api-gateway/stubs/go/apigateway-from-scratch/users/v1"
 )
 
 func main() {
