@@ -86,7 +86,6 @@ If the notes are successfully retrieved, you should get a response like this:
       "title": "<note_title>",
       "content": "<note_content>"
     },
-    ...
   ]
 }
 ```
