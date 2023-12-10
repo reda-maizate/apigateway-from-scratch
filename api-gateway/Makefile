@@ -8,10 +8,13 @@ run:
 	docker-compose build --no-cache && docker-compose up;
 
 tf-init:
-	cd ./terraform/ && terraform init && cd ./../;
+	cd ./infra/terraform/ && terraform init && cd ./../../;
 
 tf-up:
-	cd ./terraform/ && terraform apply -var-file=terraform.tfvars -auto-approve && cd ./../;
+	cd ./infra/terraform/ && terraform apply -var-file=terraform.tfvars -auto-approve && cd ./../../;
 
 tf-down:
-	cd ./terraform/ && terraform destroy -var-file=terraform.tfvars -auto-approve && cd ./../;
+	cd ./infra/terraform/ && terraform destroy -var-file=terraform.tfvars -auto-approve && cd ./../../;
+
+ansible:
+	cd ./infra/ansible/ && ansible-playbook -i inventory.ini playbook.yml && cd ./../../;

@@ -3,6 +3,9 @@ terraform {
     scaleway = {
       source = "scaleway/scaleway"
     }
+    null = {
+      source = "hashicorp/null"
+    }
   }
 }
 
