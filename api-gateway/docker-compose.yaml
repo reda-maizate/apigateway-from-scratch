@@ -1,10 +1,8 @@
-version: '3.8'
+version: '3.3'
 
 services:
   db:
-    build:
-      context: .
-      dockerfile: Dockerfile-db
+    image: rg.fr-par.scw.cloud/db-registry-namespace/db:latest
     environment:
       DB_USERNAME: admin
       DB_PASSWORD: postgres
@@ -19,10 +17,7 @@ services:
       retries: 5
 
   api_gateway:
-    build:
-      context: .
-      target: gateway
-      dockerfile: Dockerfile-services
+    image: rg.fr-par.scw.cloud/gateway-service-registry-namespace/gateway:latest
     ports:
       - 8080:8080
     environment:
@@ -31,14 +26,10 @@ services:
       DB_NAME: apigateway
       DB_PORT: 5432
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   notes_service:
-    build:
-      context: .
-      target: notes
-      dockerfile: Dockerfile-services
+    image: rg.fr-par.scw.cloud/notes-service-registry-namespace/notes:latest
     ports:
       - 50053:50053
     environment:
@@ -47,14 +38,10 @@ services:
       DB_NAME: apigateway
       DB_PORT: 5432
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   users_service:
-    build:
-      context: .
-      target: users
-      dockerfile: Dockerfile-services
+    image: rg.fr-par.scw.cloud/users-service-registry-namespace/users:latest
     ports:
       - 50052:50052
     environment:
@@ -63,14 +50,10 @@ services:
       DB_NAME: apigateway
       DB_PORT: 5432
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   permissions_service:
-    build:
-      context: .
-      target: permissions
-      dockerfile: Dockerfile-services
+    image: rg.fr-par.scw.cloud/permissions-service-registry-namespace/permissions:latest
     ports:
       - 50054:50054
     environment:
@@ -79,5 +62,4 @@ services:
       DB_NAME: apigateway
       DB_PORT: 5432
     depends_on:
-      db:
-        condition: service_healthy
+      - db

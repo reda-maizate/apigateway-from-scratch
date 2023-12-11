@@ -1,6 +1,16 @@
-# Install docker on all hosts
 ---
-- hosts: all
+- name: Wait until reachable
+  hosts: all
+  gather_facts: no  # Important
+  tasks:
+    - name: Wait for system to become reachable
+      wait_for_connection:
+
+    - name: Gather facts for the first time
+      setup:
+
+- name: Install docker
+  hosts: all
   become: true
   tasks:
     - name: Install Docker
@@ -28,3 +38,15 @@
         name: docker
         state: started
         enabled: yes
+
+- name: Copy Docker-compose file to the server
+  hosts: all
+  become: true
+  tasks:
+    - name: Copy docker-compose file
+      copy:
+        src: ../../docker-compose.yaml
+        dest: ~/docker-compose.yaml
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0644
