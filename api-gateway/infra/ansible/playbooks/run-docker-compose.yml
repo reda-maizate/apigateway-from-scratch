@@ -1,0 +1,9 @@
+---
+- name: Run docker-compose
+  hosts: all
+  become: true
+  tasks:
+    - name: Run docker-compose
+      command: docker-compose up -d
+      #args:
+      #  chdir: ~/docker-compose.yaml

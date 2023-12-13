@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package apigatewayfromscratch.permissions.v1;
+
+message PermissionModel {
+ string uuid = 1;
+ string role = 2;
+ string service = 3;
+ string resource = 4;
+ string action = 5;
+}
+
+message UserPermission {
+ string user_uuid = 1;
+ string permission_uuid = 2;
+}
+
+message CheckPermissionRequest {
+ string user_uuid = 1;
+ string service = 2;
+ string resource = 3;
+ string action = 4;
+}
+
+message CheckPermissionResponse {
+ bool authorized = 1;
+}
+
+service Permission {
+ rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
+}
