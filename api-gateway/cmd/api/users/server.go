@@ -17,6 +17,7 @@ var (
 	ENV_DB_PASSWORD = env.Get("DB_PASSWORD", "")
 	ENV_DB_NAME     = env.Get("DB_NAME", "")
 	ENV_DB_PORT     = env.Get("DB_PORT", "")
+	EVN_DB_HOST     = env.Get("DB_HOST", "")
 )
 
 func main() {
@@ -27,6 +28,7 @@ func main() {
 	}
 
 	dbConfig := &repository.DBConfig{
+		Host:     EVN_DB_HOST,
 		Username: ENV_DB_USERNAME,
 		Password: ENV_DB_PASSWORD,
 		Dbname:   ENV_DB_NAME,

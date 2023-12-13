@@ -10,6 +10,12 @@ resource "null_resource" "push_to_users_service_registry" {
 
   triggers = {
     registry_namespace_id = scaleway_registry_namespace.users-service-registry-namespace.id
+    content_hash = md5(join(",", [
+      join(",", fileset("${path.module}/../../internal", "*")),
+      join(",", fileset("${path.module}/../../cmd", "*")),
+      join(",", fileset("${path.module}/../../proto", "*")),
+      join(",", fileset("${path.module}/../../stubs", "*"))
+    ]))
   }
 
   provisioner "local-exec" {
@@ -32,6 +38,12 @@ resource "null_resource" "push_to_notes_service_registry" {
 
   triggers = {
     registry_namespace_id = scaleway_registry_namespace.notes-service-registry-namespace.id
+    content_hash = md5(join(",", [
+      join(",", fileset("${path.module}/../../internal", "*")),
+      join(",", fileset("${path.module}/../../cmd", "*")),
+      join(",", fileset("${path.module}/../../proto", "*")),
+      join(",", fileset("${path.module}/../../stubs", "*"))
+    ]))
   }
 
   provisioner "local-exec" {
@@ -53,6 +65,12 @@ resource "null_resource" "push_to_permissions_service_registry" {
 
   triggers = {
     registry_namespace_id = scaleway_registry_namespace.permissions-service-registry-namespace.id
+    content_hash = md5(join(",", [
+      join(",", fileset("${path.module}/../../internal", "*")),
+      join(",", fileset("${path.module}/../../cmd", "*")),
+      join(",", fileset("${path.module}/../../proto", "*")),
+      join(",", fileset("${path.module}/../../stubs", "*"))
+    ]))
   }
 
   provisioner "local-exec" {
@@ -74,6 +92,12 @@ resource "null_resource" "push_to_gateway_service_registry" {
 
   triggers = {
     registry_namespace_id = scaleway_registry_namespace.gateway-service-registry-namespace.id
+    content_hash = md5(join(",", [
+      join(",", fileset("${path.module}/../../internal", "*")),
+      join(",", fileset("${path.module}/../../cmd", "*")),
+      join(",", fileset("${path.module}/../../proto", "*")),
+      join(",", fileset("${path.module}/../../stubs", "*"))
+    ]))
   }
 
   provisioner "local-exec" {
@@ -95,6 +119,12 @@ resource "null_resource" "push_to_db_registry" {
 
   triggers = {
     registry_namespace_id = scaleway_registry_namespace.db-registry-namespace.id
+    content_hash = md5(join(",", [
+      join(",", fileset("${path.module}/../../internal", "*")),
+      join(",", fileset("${path.module}/../../cmd", "*")),
+      join(",", fileset("${path.module}/../../proto", "*")),
+      join(",", fileset("${path.module}/../../stubs", "*"))
+    ]))
   }
 
   provisioner "local-exec" {

@@ -8,6 +8,7 @@ import (
 )
 
 type DBConfig struct {
+	Host     string
 	Username string
 	Password string
 	Dbname   string
@@ -21,10 +22,8 @@ type DB struct {
 }
 
 func NewDB(config *DBConfig) *DB {
-	host := "host.docker.internal"
-
 	conn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		host,
+		config.Host,
 		config.Port,
 		config.Username,
 		config.Dbname,
