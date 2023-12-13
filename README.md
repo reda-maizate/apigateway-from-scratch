@@ -7,6 +7,7 @@ This repository contains a microservices architecture developed using gRPC and P
 ### Prerequisites to run
 
 - Docker ([installation page](https://docs.docker.com/get-docker/))
+- Terraform ([installation page](https://learn.hashicorp.com/tutorials/terraform/install-cli))
 - Ansible ([installation page](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html))
 - Protobuf compiler ([installation page](https://grpc.io/docs/protoc-installation/))
 - sqlc ([installation page](https://docs.sqlc.dev/en/stable/overview/install.html))
