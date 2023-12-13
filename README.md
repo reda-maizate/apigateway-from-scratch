@@ -4,19 +4,23 @@ This repository contains a microservices architecture developed using gRPC and P
 
 ## Getting Started
 
-### Prerequisites to run locally
+### Prerequisites to run
 
 - Docker ([installation page](https://docs.docker.com/get-docker/))
+- Ansible ([installation page](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html))
+- Protobuf compiler ([installation page](https://grpc.io/docs/protoc-installation/))
+- sqlc ([installation page](https://docs.sqlc.dev/en/stable/overview/install.html))
 
-### Running locally
+### Running
 
 1. Clone the repository
-2. Run the command: `make run` in the `api-gateway` directory. This will start the API Gateway and all the microservices.
-3. To test the API Gateway, you can use Postman or any other REST client. The API Gateway is available at `localhost:8080`.
+2. Run the command: `make tf-up` in the `api-gateway` directory. This will launch the infrastructure with the API Gateway and all the microservices on Scaleway.
+3. Once the command above is finished, you should have an `instance_ip` as a Terraform output. You can use this IP to access the API Gateway.
+4. To test the API Gateway, you can use Postman or any other REST client. The API Gateway URL is available at `<your_instance_ip>:8080`.
 
 ### Testing the API Gateway
 #### User service
-To create a new user, send a POST request to `localhost:8080/v1/users` with the following body:
+To create a new user, send a POST request to `<your_instance_ip>:8080/v1/users` with the following body:
 
 ```json
 {
@@ -35,7 +39,7 @@ If the user is successfully created, you should get a response like this:
 
 ---
 
-To log in, send a POST request to `localhost:8080/v1/users/login` with the following body:
+To log in, send a POST request to `<your_instance_ip>:8080/v1/users/login` with the following body:
 
 ```json
 {
@@ -54,7 +58,7 @@ If the user is successfully logged in, you should get a response like this:
 
 #### Notes service
 
-To create a new note, send a POST request to `localhost:8080/v1/notes/create` with a header `Authorization` with the value `<your_auth_token>` and the following body:
+To create a new note, send a POST request to `<your_instance_ip>:8080/v1/notes/create` with a header `Authorization` with the value `<your_auth_token>` and the following body:
 
 ```json
 {
@@ -69,7 +73,7 @@ If the note is successfully created, you should get a response like this:
 {}
 ```
 ----
-To get all notes, send a GET request to `localhost:8080/v1/notes` with a header `Authorization` with the value `<your_auth_token>`.
+To get all notes, send a GET request to `<your_instance_ip>:8080/v1/notes` with a header `Authorization` with the value `<your_auth_token>`.
 
 If the notes are successfully retrieved, you should get a response like this:
 
@@ -120,4 +124,4 @@ If the notes are successfully retrieved, you should get a response like this:
 
 
 
-Made with ❤️ by [Réda Maizate](https://www.linkedin.com/in/reda-maizate/) @ Seoul 🇰🇷
+Made with ❤️ by [Réda Maizate](https://www.linkedin.com/in/reda-maizate/) @ Seoul 🇰🇷 & Paris 🇫🇷
