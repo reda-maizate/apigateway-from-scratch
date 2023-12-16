@@ -16,5 +16,8 @@ tf-up:
 tf-down:
 	cd ./infra/terraform/ && terraform destroy -var-file=terraform.tfvars -auto-approve && cd ./../../;
 
-ansible:
-	cd ./infra/ansible/ && ansible-playbook -i inventory.ini playbook.yml && cd ./../../;
+ansible-run-all-playbooks:
+	cd ./infra/ansible/scripts && ./run-all-playbooks.sh && cd ./../../../;
+
+ansible-run-docker-compose:
+	cd ./infra/ansible/ && ansible-playbook -i inventory.ini playbook.yml --tags "docker-compose" && cd ./../../;

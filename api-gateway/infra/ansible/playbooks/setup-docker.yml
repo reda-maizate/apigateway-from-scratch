@@ -4,14 +4,14 @@
   become: true
   tasks:
     - name: Install Docker
-      apt:
-        name: docker.io
+      ansible.builtin.apt:
+        name: docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         state: present
         update_cache: yes
         force_apt_get: yes
 
     - name: Install curl
-      apt:
+      ansible.builtin.apt:
         name: curl
         state: present
         update_cache: yes

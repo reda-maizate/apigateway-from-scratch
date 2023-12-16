@@ -1,7 +1,14 @@
 resource "scaleway_instance_ip" "public_ip" {}
 
 resource "scaleway_instance_server" "my-instance" {
-  depends_on = [scaleway_instance_ip.public_ip]
+  depends_on = [
+  	scaleway_instance_ip.public_ip,
+   	null_resource.push_to_users_service_registry,
+   	null_resource.push_to_users_service_registry,
+   	null_resource.push_to_permissions_service_registry,
+   	null_resource.push_to_gateway_service_registry,
+   	null_resource.push_to_db_registry
+  ]
 
   name              = "apigateway-from-scratch-instance"
   type              = "DEV1-L"
