@@ -16,8 +16,9 @@ This repository contains a microservices architecture developed using gRPC and P
 
 1. Clone the repository
 2. Run the command: `make tf-up` in the `api-gateway` directory. This will launch the infrastructure with the API Gateway and all the microservices on Scaleway.
-3. Once the command above is finished, you should have an `instance_ip` as a Terraform output. You can use this IP to access the API Gateway.
-4. To test the API Gateway, you can use Postman or any other REST client. The API Gateway URL is available at `<your_instance_ip>:8080`.
+3. Then run the command: `infra/ansible/scripts/run-all-playbooks.sh -pkp "<your_private_key_path>"` in the `api-gateway` directory. This will install all the dependencies and start all the microservices.
+4. Once the commands above are finished, you should have an `instance_ip` as a Terraform output (you can access it, by going in the directory `infra/terraform` and run the command: `terraform output` to get it). You can use this IP to access the API Gateway.
+5. To test the API Gateway, you can use Postman or any other REST client. The API Gateway URL is available at `<your_instance_ip>:8080`.
 
 ### Testing the API Gateway
 #### User service

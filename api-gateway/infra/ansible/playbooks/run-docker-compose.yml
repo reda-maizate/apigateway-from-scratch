@@ -4,4 +4,4 @@
   become: true
   tasks:
     - name: Run docker-compose
-      command: docker-compose up -d
+      command: docker compose up -d

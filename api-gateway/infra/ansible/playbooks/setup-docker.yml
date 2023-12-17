@@ -3,54 +3,63 @@
   hosts: all
   become: true
   tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all apt packages
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: Install dependencies
+      ansible.builtin.apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - gnupg-agent
+
+    - name: Add an apt signing key for Docker
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add apt repository for stable version
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
     - name: Install Docker
       ansible.builtin.apt:
-        name: docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        name: "{{ packages }}"
         state: present
-        update_cache: yes
-        force_apt_get: yes
-
-    - name: Install curl
-      ansible.builtin.apt:
-        name: curl
-        state: present
-        update_cache: yes
-
-    - name: Download Docker Compose
-      get_url:
-        url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-linux-x86_64
-        dest: /usr/local/bin/docker-compose
-        mode: '0755'
-
-    - name: Check Docker Compose version
-      command: docker-compose --version
-      register: result
-      changed_when: False
-
-    - name: Display Docker Compose version
-      debug:
-        var: result.stdout_lines
+      vars:
+        packages:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+          - docker-buildx-plugin
 
     - name: Add user to docker group
-      user:
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: yes
-
-    - name: Ensure docker service is running
-      service:
-        name: docker
-        state: started
-        enabled: yes
+      ansible.builtin.user:
+        name: "{{ansible_user}}"
+        group: docker
 
 - name: Copy Docker-compose file to the server
   hosts: all
   become: true
+
   tasks:
-    - name: Copy docker-compose file
-      copy:
-        src: ../../../docker-compose.yaml
-        dest: ~/docker-compose.yaml
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: 0644
+  - name: Copy docker-compose file
+    copy:
+      src: ../../../docker-compose.yaml
+      dest: ~/docker-compose.yaml
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+      mode: 0644

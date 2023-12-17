@@ -26,9 +26,7 @@ instance_ip=$(cd ./infra/terraform/ && terraform output -json instance_ip | jq -
 #echo "Private key path: $pkp"
 
 echo "Running all playbooks..."
-#echo "DEBUG: ansible-playbook -u root -i '$instance_ip,' --private-key $pkp infra/ansible/playbooks/wait-until-reachable.yml"
 
 # Run wait until reachable playbook
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/wait-until-reachable.yml && \
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/setup-docker.yml && \
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/run-docker-compose.yml
