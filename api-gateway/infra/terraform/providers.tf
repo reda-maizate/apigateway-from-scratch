@@ -6,6 +6,9 @@ terraform {
     null = {
       source = "hashicorp/null"
     }
+    cloudflare = {
+      source = "cloudflare/cloudflare"
+    }
   }
 }
 
@@ -14,4 +17,8 @@ provider "scaleway" {
   secret_key = var.scaleway_secret_key
   project_id = var.scaleway_project_id
   region     = var.scaleway_region
+}
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_key
 }
