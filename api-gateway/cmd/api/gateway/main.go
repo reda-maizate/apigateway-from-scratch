@@ -20,14 +20,14 @@ func main() {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	err_user := userstubs.RegisterUserHandlerFromEndpoint(ctx, mux, "users_service:50052", opts)
-	err_note := notestubs.RegisterNoteHandlerFromEndpoint(ctx, mux, "notes_service:50053", opts)
+	errUser := userstubs.RegisterUserHandlerFromEndpoint(ctx, mux, "users_service:50052", opts)
+	errNote := notestubs.RegisterNoteHandlerFromEndpoint(ctx, mux, "notes_service:50053", opts)
 
-	if err_user != nil {
-		log.Fatalf("failed to start HTTP user server: %v", err_user)
-	} else if err_note != nil {
-		log.Fatalf("failed to start HTTP note server: %v", err_note)
+	if errUser != nil {
+		log.Fatalf("failed to start HTTP user server: %v", errUser)
+	} else if errNote != nil {
+		log.Fatalf("failed to start HTTP note server: %v", errNote)
 	}
 
-	http.ListenAndServe(":8080", mux)
+	http.ListenAndServe(":80", mux)
 }

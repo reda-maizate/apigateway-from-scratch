@@ -18,7 +18,7 @@ FROM builder AS gateway
 # Command to run the application when starting the container
 COPY --from=builder /app/ /app/
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main ./cmd/api/gateway/
-EXPOSE 8080
+EXPOSE 80
 
 CMD ["/app/main"]
 

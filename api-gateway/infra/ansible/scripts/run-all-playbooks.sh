@@ -31,4 +31,5 @@ echo "Running all playbooks..."
 # Run wait until reachable playbook
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/wait-until-reachable.yml && \
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/setup-docker.yml && \
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/run-docker-compose.yml
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/run-docker-compose.yml #&& \
+#ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i $instance_ip, --private-key $pkp infra/ansible/playbooks/setup-certbot.yml;

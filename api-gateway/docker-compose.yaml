@@ -14,7 +14,7 @@ services:
       DB_NAME: apigateway
       DB_PORT: 5432
     ports:
-      - 5432:5432
+      - "5432:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -q" ]
       interval: 3s
@@ -24,7 +24,7 @@ services:
   api_gateway:
     image: rg.fr-par.scw.cloud/gateway-service-registry-namespace/gateway:latest
     ports:
-      - 8080:8080
+      - "80:80"
     environment:
       DB_HOST: db
       DB_USERNAME: admin
@@ -38,7 +38,7 @@ services:
   notes_service:
     image: rg.fr-par.scw.cloud/notes-service-registry-namespace/notes:latest
     ports:
-      - 50053:50053
+      - "50053:50053"
     environment:
       DB_HOST: db
       DB_USERNAME: admin
@@ -52,7 +52,7 @@ services:
   users_service:
     image: rg.fr-par.scw.cloud/users-service-registry-namespace/users:latest
     ports:
-      - 50052:50052
+      - "50052:50052"
     environment:
       DB_HOST: db
       DB_USERNAME: admin
@@ -66,7 +66,7 @@ services:
   permissions_service:
     image: rg.fr-par.scw.cloud/permissions-service-registry-namespace/permissions:latest
     ports:
-      - 50054:50054
+      - "50054:50054"
     environment:
       DB_HOST: db
       DB_USERNAME: admin
