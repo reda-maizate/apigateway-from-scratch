@@ -7,6 +7,14 @@ resource "scaleway_instance_security_group" "my-security-group" {
   }
   inbound_rule {
     action = "accept"
-    port   = "8080" # API Gateway entrypoint
+    port   = "80" # HTTP API Gateway entrypoint
+  }
+  inbound_rule {
+    action = "accept"
+	port   = "8080" # API Gateway entrypoint
+  }
+  inbound_rule {
+    action = "accept"
+    port   = "443" # HTTPS API Gateway entrypoint
   }
 }

@@ -1,5 +1,7 @@
 version: '3.8'
 
+networks:
+  nginx-proxy:
 
 services:
   db:
@@ -20,11 +22,14 @@ services:
       interval: 3s
       timeout: 5s
       retries: 5
+    networks:
+      - nginx-proxy
 
   api_gateway:
     image: rg.fr-par.scw.cloud/gateway-service-registry-namespace/gateway:latest
     ports:
       - "80:80"
+      - "8080:80"
     environment:
       DB_HOST: db
       DB_USERNAME: admin
@@ -34,6 +39,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - nginx-proxy
+
+  nginx:
+    build: ./nginx/
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api_gateway
+    networks:
+      - nginx-proxy
 
   notes_service:
     image: rg.fr-par.scw.cloud/notes-service-registry-namespace/notes:latest
@@ -48,6 +66,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - nginx-proxy
 
   users_service:
     image: rg.fr-par.scw.cloud/users-service-registry-namespace/users:latest
@@ -62,6 +82,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - nginx-proxy
 
   permissions_service:
     image: rg.fr-par.scw.cloud/permissions-service-registry-namespace/permissions:latest
@@ -76,3 +98,5 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - nginx-proxy

@@ -56,10 +56,17 @@
   become: true
 
   tasks:
-  - name: Copy docker-compose file
-    copy:
-      src: ../../../docker-compose.yaml
-      dest: ~/docker-compose.yaml
-      owner: "{{ ansible_user }}"
-      group: "{{ ansible_user }}"
-      mode: 0644
+    - name: Copy docker-compose file
+      ansible.builtin.copy:
+        src: ../../../docker-compose.yaml
+        dest: ~/docker-compose.yaml
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0644
+    - name: Copy nginx directory
+      ansible.builtin.copy:
+        src: ../../../nginx
+        dest: ~/
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0644

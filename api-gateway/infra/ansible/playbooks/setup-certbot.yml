@@ -1,21 +1,33 @@
----
-- name: Setup Certbot
-  hosts: all
-  become: true
-  tasks:
-    - name: Install Certbot and Nginx
-      ansible.builtin.apt:
-        name:
-          - certbot
-          - python3-certbot-nginx
-          - nginx
-        state: present
-
-    - name: Obtain SSL Certificate
-      command: certbot --nginx -d api.navyblueglove.uk -d www.api.navyblueglove.uk --non-interactive --agree-tos --email reda.maizate@gmail.com
-
-    - name: Add cron job for automatic certificate renewal
-      cron:
-        name: "Certbot Auto Renewal"
-        minute: "*/12"
-        job: "certbot renew"
+#---
+#- name: Setup Certbot
+#  hosts: all
+#  become: true
+#  vars:
+#    letsencrypt_email: reda.maizate@gmail.com
+#    domain_name: api.navyblueglove.uk:8080
+#  tasks:
+#    - name: Install Certbot and Nginx
+#      ansible.builtin.apt:
+#        name:
+#          - certbot
+#          - python3-certbot-nginx
+#          - nginx
+#        state: present
+#
+#    - name: Start Nginx
+#      ansible.builtin.service:
+#        name: nginx
+#        state: started
+#        enabled: true
+#
+#    - name: Obtain SSL Certificate
+#      command: certbot --non-interactive --nginx -d {{ domain_name }} -m {{ letsencrypt_email }} --agree-tos
+#      register: certbot_result
+#      changed_when: "'Congratulations!' in certbot_result.stdout"
+#      notify: Restart Nginx
+#
+#  handlers:
+#    - name: Restart Nginx
+#      systemd:
+#        name: nginx
+#        state: restarted
